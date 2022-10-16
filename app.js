@@ -29,7 +29,7 @@ const bookingsRoute = require('./routes/bookings');
 //using Routes
 app.use(`${api}/users`,usersRoute);
 app.use(`${api}/vehicles`,vehiclesRoute);
-app.use(`${api}/bookings`,bookingRoute);
+app.use(`${api}/bookings`,bookingsRoute);
 
 
 
