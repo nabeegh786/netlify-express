@@ -2,7 +2,9 @@ const express = require('express');
 const router = express.Router();
 
 const { vehiclesStorage,
-        vehicleCategoryStorage } = require('../middlewear/multerStorage')
+        vehicleCategoryStorage,
+        vehiclesPapersStorage,
+        vehiclesInsuranceStorage } = require('../middlewear/multerStorage')
         
 const multer = require('multer');
 
@@ -16,6 +18,10 @@ const { getVehicleCategories,
 
 const uploadOptionsVehicles = multer({storage: vehiclesStorage});
 const uploadOptionsVehicleCategory = multer({storage: vehicleCategoryStorage});
+
+const uploadOptionsVehiclesPapers = multer({storage: vehiclesStorage});
+const uploadOptionsVehiclesInsurance = multer({storage: vehicleCategoryStorage});
+
 
 const { getNearByVehicles, 
         getVehicles, 
@@ -74,16 +80,17 @@ router.route('/vehiclecategory/:id')
 
 router.route(`/getnearbyvehicles`)
         .get(getNearByVehiclesValidation,
-              //  advancedResults(Vehicle, 'vehicleCategory'),
+                advancedResults(Vehicle, 'vehicleCategory'),
                 getNearByVehicles)
 
-router.route(`/`)
+router.route(`/`) 
         .get(advancedResults(Vehicle, 'vehicleCategory'),getVehicles)
         .post((req,res,next) => {
                 uploadOptionsVehicles.array('images',10)(req, res, function (err) {
                 if (err instanceof multer.MulterError) {
                         if(err.message === 'Unexpected field'){
-                                return res.status(400).json({Success:false,Message:'more than 10 images are not allowed', responseCode : 400});
+                                var code = err.code;
+                                return res.status(400).json({Success:false,Message:'more than 10 vehicle images are not allowed', responseCode : 400, errorCode : code});
                         }
                         // A Multer error occurred   when uploading
                         return res.status(500).json({Success:false,Message:err.message, responseCode : 500});
@@ -95,7 +102,43 @@ router.route(`/`)
                 next();
                 })
                
-        },vehicleRegistrationValidation,addVehicle)
+        // },
+        // (req,res,next) => {
+        //         uploadOptionsVehiclesPapers.array('images',2)(req, res, function (err) {
+        //         if (err instanceof multer.MulterError) {
+        //                 if(err.message === 'Unexpected field'){
+        //                         return res.status(400).json({Success:false,Message:'more than 2 vehicle paper images are not allowed', responseCode : 400});
+        //                 }
+        //                 // A Multer error occurred   when uploading
+        //                 return res.status(500).json({Success:false,Message:err.message, responseCode : 500});
+        //         } else if (err) {
+        //                 // An unknown error occurred when uploading.
+        //                 return res.status(400).json({Success:false,Message:err.message, responseCode : 400});      
+        //         }
+        //         // Everything went fine.
+        //         next();
+        //         })
+               
+        // },
+        // (req,res,next) => {
+        //         uploadOptionsVehiclesInsurance.array('images',2)(req, res, function (err) {
+        //         if (err instanceof multer.MulterError) {
+        //                 if(err.message === 'Unexpected field'){
+        //                         return res.status(400).json({Success:false,Message:'more than 2 vehicle insurance images are not allowed', responseCode : 400});
+        //                 }
+        //                 // A Multer error occurred   when uploading
+        //                 return res.status(500).json({Success:false,Message:err.message, responseCode : 500});
+        //         } else if (err) {
+        //                 // An unknown error occurred when uploading.
+        //                 return res.status(400).json({Success:false,Message:err.message, responseCode : 400});      
+        //         }
+        //         // Everything went fine.
+        //         next();
+        //         })
+               
+        // }
+        }
+        ,vehicleRegistrationValidation,addVehicle)
 
 router.route(`/:id`)
         .get(getVehicleById)

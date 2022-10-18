@@ -4,7 +4,7 @@ const {isValidObjectId} = require('mongoose');
 const {validationResult} = require('express-validator');
 // include node fs module
 var fs = require('fs');
-
+ 
 
 
 exports.getVehicleCategories = asyncHandler(async (req, res, next) => {
@@ -55,7 +55,7 @@ exports.addVehicleCategories = asyncHandler(async (req, res, next) =>{
                 brand        : req.body.brand,
                 model        : req.body.model,
                 year         : req.body.year,
-                vehicleType  : req.body.vehicleType,
+               // vehicleType  : req.body.vehicleType,
                 image        : basePath+fileName
             } 
         );
@@ -80,7 +80,7 @@ exports.addVehicleCategories = asyncHandler(async (req, res, next) =>{
         brand       : req.body.brand,
         model       : req.body.model,
         year        : req.body.year,
-        vehicleType : req.body.vehicleType,
+       // vehicleType : req.body.vehicleType,
         image       : basePath+fileName
     });
 

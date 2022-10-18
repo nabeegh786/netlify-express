@@ -18,6 +18,10 @@ const vehicleSchema = mongoose.Schema({
         required: true,
         unique: true
     },
+    vehicleType:{
+        type:String,
+         required:true
+     },
     pickupLocation: {
         type: {
             type: String,

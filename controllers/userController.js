@@ -70,7 +70,6 @@ exports.addUser = asyncHandler(async (req, res, next) => {
         passwordHash: bcrypt.hashSync(req.body.password, +bcryptsecret),
         email: req.body.email,
         phone: req.body.phone
-
     })
 
     user = await user.save();

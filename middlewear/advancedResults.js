@@ -21,8 +21,9 @@ const advancedResults = (model, populate) => async (req, res, next) => {
   //{registrationNumber:["BVAS-007","CVAS-007"]}
   //{registrationNumber:{$in:["BVAS-007","CVAS-007"]}}
   // Finding resource
-
+  
   query = model.find(JSON.parse(queryStr));
+
 
   // Select Fields
   if (req.query.select) {

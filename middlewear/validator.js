@@ -72,8 +72,17 @@ const userLoginValidation = [
 const vehicleCategoriesValidation = [
     check('brand').not().isEmpty().withMessage('vehicle brand not provided'),
     check('model').not().isEmpty().withMessage('vehicle model not provided'),
+    check('model').custom((value, {req, loc, path}) => {
+        return VehicleCategory.findOne({
+            model : req.body.model
+        }).then(model => {
+            if (model) {
+                return Promise.reject(`Vehicle Model = "${req.body.model}" already exists`)
+            }
+        })
+        }),
     check('year').not().isEmpty().withMessage('vehicle model year not provided').isNumeric().withMessage('vehicle model year should be numeric only'),
-    check('vehicleType').not().isEmpty().withMessage('vehicle type not provided')
+    
 ]
 
 const vehicleRegistrationValidation = [
@@ -106,6 +115,8 @@ const vehicleRegistrationValidation = [
         });
     }),
 
+    //vehicle Type
+    check('vehicleType').not().isEmpty().withMessage('vehicle type not provided'),
     //registration no
     check('registrationNumber'  ,'vehicle registration no is not provided').not().isEmpty(),
     check('registrationNumber'  ,'vehicle registration no should be atleast 5 characters long').isLength({min:5}),

@@ -8,14 +8,11 @@ const vehicleCategorySchema = mongoose.Schema({
     },
     model:{
         type:String,
-        required:true
+        required:true,
+        unique:true
     },
     year:{
         type:String,
-        required:true
-    },
-    vehicleType:{
-       type:String,
         required:true
     },
     image:{

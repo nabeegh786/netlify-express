@@ -8,48 +8,47 @@ const asyncHandler = require('../middlewear/async');
 
 exports.getNearByVehicles = asyncHandler(async (req,res)=>{
 
-    if(!req.query.filter)
-    {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ Error: errors.array()[0].msg , responseCode :400});
+    if(!req.query.filter){
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+        return res.status(400).json({ Error: errors.array()[0].msg , responseCode :400});
+        }
     }
-}
     
         
     var query;
     // filter Fields
-  if (req.query.filter) {
-    // query = query.find({ $and: [ { registrationNumber : ["BVAS-007","CVAS-007","NILE-007"]}, { noOfDoors : ["0","2"] } ] });
-    if (req.query.filter.includes('||')) {
-      const fieldsWithValues = req.query.filter.split('||');
-      var obj = [];
-      fieldsWithValues.map(field => {
-        item = {};
-        var index = field.split("=");
-        var fieldName = index[0];
-        var fieldValue = index[1].split(',');
-        item[fieldName] = fieldValue;
-        obj.push(item);
+    if (req.query.filter) {
+         // query = query.find({ $and: [ { registrationNumber : ["BVAS-007","CVAS-007","NILE-007"]}, { noOfDoors : ["0","2"] } ] });
+        if (req.query.filter.includes('||')) {
+        const fieldsWithValues = req.query.filter.split('||');
+        var obj = [];
+        fieldsWithValues.map(field => {
+            item = {};
+            var index = field.split("=");
+            var fieldName = index[0];
+            var fieldValue = index[1].split(',');
+            item[fieldName] = fieldValue;
+            obj.push(item);
 
-      });
-      query = await Vehicle.find({ $and: obj });
+        });
+        query = await Vehicle.find({ $and: obj });
     }
 
     else if (req.query.filter.includes('|')) {
-      const fieldsWithValues = req.query.filter.split('|');
-      var obj = [];
-      fieldsWithValues.map(field => {
-        item = {};
-        var index = field.split("=");
-        var fieldName = index[0];
-        var fieldValue = index[1].split(',');
-        item[fieldName] = fieldValue;
-        obj.push(item);
+        const fieldsWithValues = req.query.filter.split('|');
+        var obj = [];
+        fieldsWithValues.map(field => {
+            item = {};
+            var index = field.split("=");
+            var fieldName = index[0];
+            var fieldValue = index[1].split(',');
+            item[fieldName] = fieldValue;
+            obj.push(item);
 
       });
 
-      query = await Vehicle.find({ $or: obj });
+        query = await Vehicle.find({ $or: obj });
     }
     else{
  
@@ -151,6 +150,7 @@ exports.addVehicle = asyncHandler(async (req,res) => {
                     vehicleOwner             : req.body.vehicleOwner,
                     vehicleCategory          : req.body.vehicleCategory,
                     registrationNumber       : req.body.registrationNumber,
+                    vehicleType              : req.body.vehicleType,
                     pickupLocation           : pickupLocationGeoJson,
                     description              : req.body.description,
                     noOfSeats                : req.body.noOfSeats,
@@ -169,7 +169,6 @@ exports.addVehicle = asyncHandler(async (req,res) => {
                     .then((vehicle)=>{
                     return  res.status(200).json({Success:true,Message:'Vehile added Successfully',Payload:vehicle, responseCode : 200});
                 } )
-            
             }
             
             if(!(req.body.isAvailableForSelfDrive == "true")){
@@ -183,6 +182,7 @@ exports.addVehicle = asyncHandler(async (req,res) => {
                 vehicleOwner                 : req.body.vehicleOwner,
                 vehicleCategory              : req.body.vehicleCategory,
                 registrationNumber           : req.body.registrationNumber,
+                vehicleType                  : req.body.vehicleType,
                 pickupLocation               : pickupLocationGeoJson,
                 description                  : req.body.description,
                 noOfSeats                    : req.body.noOfSeats,
