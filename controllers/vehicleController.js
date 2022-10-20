@@ -3,7 +3,25 @@ const {isValidObjectId} = require('mongoose');
 const {validationResult} = require('express-validator');
 const asyncHandler = require('../middlewear/async');
 
+var fs = require('fs');
 
+var deleteImages = (images,papers,insurance) => {
+    images?.map((path)=>{
+        var directory = __dirname.replace("controllers", "");
+        path=path.replace("http://localhost:8000",directory);
+        fs.unlinkSync(path);
+    });
+    papers?.map((path)=>{
+        var directory = __dirname.replace("controllers", "");
+        path=path.replace("http://localhost:8000",directory);
+        fs.unlinkSync(path);
+    });
+    insurance?.map((path)=>{
+        var directory = __dirname.replace("controllers", "");
+        path=path.replace("http://localhost:8000",directory);
+        fs.unlinkSync(path);
+    });
+}
 
 
 exports.getNearByVehicles = asyncHandler(async (req,res)=>{
@@ -107,35 +125,78 @@ exports.getVehicleById = asyncHandler(async (req,res)=>{
     return res.status(404).json({Success:false,Message:'no vehicle found', responseCode :404});
 });
 
-exports.addVehicle = asyncHandler(async (req,res) => {
-    const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-          return res.status(400).json({Success:false,Message: errors.array()[0].msg , responseCode :400});
-        }
+exports.addVehicle = asyncHandler(async (req,res) => {  
+
+    //handling vehicle images
+    const files = req.files;
+    let imagePaths = [];
+    let vehiclePapersImagePaths = [];
+    let vehicleInsuranceImagesPaths = [];
+    const basePath = `${req.protocol}://${req.get('host')}/public/images/`;
+    if(files){
+        let  filePath  = "";
+        files.images?.map((file) => {
+            filePath = `${basePath+'vehicles/'}${file.filename}`;
+            imagePaths.push(filePath);
+        } )
+        files.vehiclePapers?.map((file) => {
+            filePath = `${basePath+'vehicle-papers/'}${file.filename}`;
+            vehiclePapersImagePaths.push(filePath);
+        } )
+        files.vehicleInsurance?.map((file) => {
+            filePath = `${basePath+'vehicle-insurance/'}${file.filename}`;
+            vehicleInsuranceImagesPaths.push(filePath);
+        } )
+    }
+    else
+    {
+        deleteImages(imagePaths,vehiclePapersImagePaths,vehicleInsuranceImagesPaths);
+        return res.status(400).json({Success:false,Message:'vehicle images not provided, atleast 1 image is required', responseCode :400});
+    }
     
-        var coordinatesArray = req.body.pickupLocation.map((item) => {
-            return Number(item);
-        });
-        const pickupLocationGeoJson = {type:"Point",coordinates:coordinatesArray};
+    if(imagePaths.length<1){
+        deleteImages(imagePaths,vehiclePapersImagePaths,vehicleInsuranceImagesPaths);
+        return res.status(400).json({Success:false,Message:'vehicle images not provided, atleast 1 image is required', responseCode :400});
+    }
+    if(vehiclePapersImagePaths.length<1){
+        deleteImages(imagePaths,vehiclePapersImagePaths,vehicleInsuranceImagesPaths);
+        return res.status(400).json({Success:false,Message:'vehicle paper images not provided, atleast 1 vhicle paper image is required', responseCode :400});
+    }
+    if(vehicleInsuranceImagesPaths.length<1){
+        deleteImages(imagePaths,vehiclePapersImagePaths,vehicleInsuranceImagesPaths);
+        return res.status(400).json({Success:false,Message:'vehicle insurance paper images not provided, atleast 1 vehicle insurance paper image is required', responseCode :400});
+    }
+    
 
-        const files = req.files;
-        let imagePaths = [];
-        const basePath = `${req.protocol}://${req.get('host')}/public/images/vehicles/`;
-        if(files){
-            files.map((file) => {
-                const filePath = `${basePath}${file.filename}`;
-                imagePaths.push(filePath);
-            } )
-        }
-        else
-        {
-            return res.status(400).json({Success:false,Message:'vehicle images not provided, atleast 1 image is required', responseCode :400});
-        }
 
-        if(req.body.isAvailableForSelfDrive == 'true' || req.body.isAvailableForSelfDrive == 'false')
-        {
-            if(req.body.isAvailableForSelfDrive == 'true'){
-                const selfDriveCharges  = { 
+
+
+
+
+     //handling validation errors
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        deleteImages(imagePaths,vehiclePapersImagePaths,vehicleInsuranceImagesPaths);
+        return res.status(400).json({Success:false,Message: errors.array()[0].msg , responseCode :400});
+    }
+    var coordinatesArray = req.body.pickupLocation.map((item) => {
+        return Number(item);
+    });
+    const pickupLocationGeoJson = {type:"Point",coordinates:coordinatesArray};
+
+
+
+
+
+
+
+
+    
+    //inserting vehicle in database
+    if(req.body.isAvailableForSelfDrive == 'true' || req.body.isAvailableForSelfDrive == 'false')
+    {
+        if(req.body.isAvailableForSelfDrive == 'true'){
+            const selfDriveCharges  = { 
                     selfDriveHourlyCharges   : Number(req.body.selfDriveHourlyCharges),
                     selfDriveDailyCharges    : Number(req.body.selfDriveDailyCharges),
                     selfDriveWeeklyCharges   : Number(req.body.selfDriveWeeklyCharges),
@@ -160,6 +221,8 @@ exports.addVehicle = asyncHandler(async (req,res) => {
                     noOfDoors                : req.body.noOfDoors,
                     isAircondition           : req.body.isAircondition,
                     images                   : imagePaths,
+                    vehiclePapers            : vehiclePapersImagePaths,
+                    vehicleInsurance         : vehicleInsuranceImagesPaths,
                     isAvailableForSelfDrive  : req.body.isAvailableForSelfDrive,
                     selfDriveCharges         : selfDriveCharges,
                     withDriverCharges        : withDriverCharges
@@ -192,6 +255,8 @@ exports.addVehicle = asyncHandler(async (req,res) => {
                 noOfDoors                    : req.body.noOfDoors,
                 isAircondition               : req.body.isAircondition,
                 images                       : imagePaths,
+                vehiclePapers                : vehiclePapersImagePaths,
+                vehicleInsurance             : vehicleInsuranceImagesPaths,
                 isAvailableForSelfDrive      : req.body.isAvailableForSelfDrive,
                 selfDriveCharges             : null,
                 withDriverCharges            : withDriverCharges
@@ -199,13 +264,16 @@ exports.addVehicle = asyncHandler(async (req,res) => {
 
                 vehicle.save()
                 .then((vehicle) => {
-                return  res.status(200).json({Success:true,Message:'Vehile added Successfully',Payload:vehicle , responseCode : 200});
+                return  res.status(200).json({Success:true,Message:'Vehicle added Successfully',Payload:vehicle , responseCode : 200});
                 })
             }
 
         }
         else
         {
+            deleteImages(imagePaths,vehiclePapersImagePaths,vehicleInsuranceImagesPaths);
             return res.status(400).json({Success:false,Message:'is Available for self drive info not provided', responseCode : 400});
         }
 })
+
+

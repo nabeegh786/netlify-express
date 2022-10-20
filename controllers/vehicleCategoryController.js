@@ -55,7 +55,7 @@ exports.addVehicleCategories = asyncHandler(async (req, res, next) =>{
                 brand        : req.body.brand,
                 model        : req.body.model,
                 year         : req.body.year,
-               // vehicleType  : req.body.vehicleType,
+                vehicleType  : req.body.vehicleType,
                 image        : basePath+fileName
             } 
         );
@@ -80,7 +80,7 @@ exports.addVehicleCategories = asyncHandler(async (req, res, next) =>{
         brand       : req.body.brand,
         model       : req.body.model,
         year        : req.body.year,
-       // vehicleType : req.body.vehicleType,
+        vehicleType : req.body.vehicleType,
         image       : basePath+fileName
     });
 

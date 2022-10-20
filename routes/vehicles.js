@@ -19,10 +19,6 @@ const { getVehicleCategories,
 const uploadOptionsVehicles = multer({storage: vehiclesStorage});
 const uploadOptionsVehicleCategory = multer({storage: vehicleCategoryStorage});
 
-const uploadOptionsVehiclesPapers = multer({storage: vehiclesStorage});
-const uploadOptionsVehiclesInsurance = multer({storage: vehicleCategoryStorage});
-
-
 const { getNearByVehicles, 
         getVehicles, 
         getVehicleById, 
@@ -86,11 +82,28 @@ router.route(`/getnearbyvehicles`)
 router.route(`/`) 
         .get(advancedResults(Vehicle, 'vehicleCategory'),getVehicles)
         .post((req,res,next) => {
-                uploadOptionsVehicles.array('images',10)(req, res, function (err) {
+                uploadOptionsVehicles.fields(
+                        [
+                            {
+                                name:'images',
+                                maxCount:10
+                            },
+                            {
+                                name: 'vehiclePapers',
+                                maxCount:10
+                            },
+                            {
+                                name: 'vehicleInsurance',
+                                maxCount:10
+                            }
+                        ]
+                         )(req, res, function (err) {
                 if (err instanceof multer.MulterError) {
                         if(err.message === 'Unexpected field'){
                                 var code = err.code;
-                                return res.status(400).json({Success:false,Message:'more than 10 vehicle images are not allowed', responseCode : 400, errorCode : code});
+                               // if(code === 'LIMIT_UNEXPECTED_FILE')
+                                //        return res.status(400).json({Success:false,Message:`Ashu saley tune image ghalat fieldName se bheji hai spelling check kr sahi se (images, vehiclePapers, vehicleInsurance) yeh teen hai`, responseCode : 400, errorCode : code});
+                                return res.status(400).json({Success:false,Message:'more than 10 images for 1 field are not allowed for vehilces', responseCode : 400, errorCode : code});
                         }
                         // A Multer error occurred   when uploading
                         return res.status(500).json({Success:false,Message:err.message, responseCode : 500});
@@ -101,44 +114,8 @@ router.route(`/`)
                 // Everything went fine.
                 next();
                 })
-               
-        // },
-        // (req,res,next) => {
-        //         uploadOptionsVehiclesPapers.array('images',2)(req, res, function (err) {
-        //         if (err instanceof multer.MulterError) {
-        //                 if(err.message === 'Unexpected field'){
-        //                         return res.status(400).json({Success:false,Message:'more than 2 vehicle paper images are not allowed', responseCode : 400});
-        //                 }
-        //                 // A Multer error occurred   when uploading
-        //                 return res.status(500).json({Success:false,Message:err.message, responseCode : 500});
-        //         } else if (err) {
-        //                 // An unknown error occurred when uploading.
-        //                 return res.status(400).json({Success:false,Message:err.message, responseCode : 400});      
-        //         }
-        //         // Everything went fine.
-        //         next();
-        //         })
-               
-        // },
-        // (req,res,next) => {
-        //         uploadOptionsVehiclesInsurance.array('images',2)(req, res, function (err) {
-        //         if (err instanceof multer.MulterError) {
-        //                 if(err.message === 'Unexpected field'){
-        //                         return res.status(400).json({Success:false,Message:'more than 2 vehicle insurance images are not allowed', responseCode : 400});
-        //                 }
-        //                 // A Multer error occurred   when uploading
-        //                 return res.status(500).json({Success:false,Message:err.message, responseCode : 500});
-        //         } else if (err) {
-        //                 // An unknown error occurred when uploading.
-        //                 return res.status(400).json({Success:false,Message:err.message, responseCode : 400});      
-        //         }
-        //         // Everything went fine.
-        //         next();
-        //         })
-               
-        // }
         }
-        ,vehicleRegistrationValidation,addVehicle)
+        , vehicleRegistrationValidation,addVehicle)
 
 router.route(`/:id`)
         .get(getVehicleById)

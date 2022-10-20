@@ -87,6 +87,20 @@ const vehicleSchema = mongoose.Schema({
         validate: [arrayLimit, 'no of images exceeded the limit of 10'],
         required: true
     },
+    vehiclePapers: {
+        type: [{
+            type: String
+        }],
+        validate: [arrayLimit, 'no of vehicle-paper images exceeded the limit of 10'],
+        required: true
+    },
+    vehicleInsurance: {
+        type: [{
+            type: String
+        }],
+        validate: [arrayLimit, 'no of vehicle-insurance images exceeded the limit of 10'],
+        required: true
+    },
     isAvailableForSelfDrive: {
         type: Boolean,
         required: true
