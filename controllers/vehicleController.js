@@ -128,7 +128,7 @@ exports.getVehicleById = asyncHandler(async (req,res)=>{
 exports.addVehicle = asyncHandler(async (req,res) => {  
 
     //handling vehicle images
-    const files = req.files;
+    const files = req.files; 
     let imagePaths = [];
     let vehiclePapersImagePaths = [];
     let vehicleInsuranceImagesPaths = [];
@@ -138,15 +138,15 @@ exports.addVehicle = asyncHandler(async (req,res) => {
         files.images?.map((file) => {
             filePath = `${basePath+'vehicles/'}${file.filename}`;
             imagePaths.push(filePath);
-        } )
+        } );
         files.vehiclePapers?.map((file) => {
             filePath = `${basePath+'vehicle-papers/'}${file.filename}`;
             vehiclePapersImagePaths.push(filePath);
-        } )
+        } );
         files.vehicleInsurance?.map((file) => {
             filePath = `${basePath+'vehicle-insurance/'}${file.filename}`;
             vehicleInsuranceImagesPaths.push(filePath);
-        } )
+        } );
     }
     else
     {
