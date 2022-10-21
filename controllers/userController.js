@@ -36,7 +36,7 @@ exports.getUsers = asyncHandler(async (req, res, next) => {
         .select('-passwordHash');
 
     if (!users) {
-        return res.status(404).json({ Success: false, Message: 'Users not found', responseCode :404 });
+        return res.status(404).json({ Success: false, Message: 'no user found', responseCode :404 });
     }
     
     return res.status(200).json({ Success: true, Users: users , responseCode :200});

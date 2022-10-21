@@ -1,6 +1,8 @@
 const multer = require('multer');
+
 // include node fs module
 var fs = require('fs');
+
 const { MulterError } = require('multer');
 
 const FILE_TYPE_MAP = {
