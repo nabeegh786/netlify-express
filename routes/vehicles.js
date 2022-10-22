@@ -2,9 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const { vehiclesStorage,
-        vehicleCategoryStorage,
-        vehiclesPapersStorage,
-        vehiclesInsuranceStorage } = require('../middlewear/multerStorage')
+        vehicleCategoryStorage } = require('../middlewear/multerStorage')
         
 const multer = require('multer');
 
@@ -47,9 +45,11 @@ router.route('/vehiclecategory')
                         } else if (err) {
                           // An unknown error occurred when uploading.
                          return res.status(400).json({Success:false,Message:err.message, responseCode : 500});      
-                        }
-                        // Everything went fine.
+                        }else{
+                         // Everything went fine.
                         next();
+                        }
+                       
                 })
         }, vehicleCategoriesValidation, addVehicleCategories);
 
@@ -66,9 +66,10 @@ router.route('/vehiclecategory/:id')
                         } else if (err) {
                           // An unknown error occurred when uploading.
                           return res.status(500).json({Success:false,Message:err.message, responseCode : 500});      
-                        }
+                        }else{
                         // Everything went fine.
                         next();
+                        }
                 })
                     
         }, vehicleCategoriesValidation, addVehicleCategories)

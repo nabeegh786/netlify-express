@@ -8,13 +8,14 @@ const protect = async (req, res, next) =>{
         const bearerHeader  = req.headers['authorization'];
         //Check if Header is undefined
         if(typeof(bearerHeader) !== 'undefined'){
+            
             //Token Format =  Bearer XCDSFSSVSBWTJGMYUDSEFA$#%%#%#TSFDF#%$RD
             //Split at space
             const bearerToken = bearerHeader.split(' ')[1];
-            //Set the Token
-            //req.token = bearerToken;
+
             //verify the jwt token  
             await jwt.verify(bearerToken, jwtsecret);
+            
             //Call the next middlewear
             next();
         }else{

@@ -7,7 +7,7 @@ const compare = require('../middlewear/faceComparision');
 
 
 // http://localhost:8000/api/v1/users
-//radcliff1.jpg"
+
 router.route(`/test`)
       .get(compare, isfaceMatched);
 

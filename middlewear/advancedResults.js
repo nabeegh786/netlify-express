@@ -2,7 +2,6 @@ const {validationResult} = require('express-validator');
 
 const advancedResults = (model, populate) => async (req, res, next) => {
   let query;
-
   // Copy req.query
   const reqQuery = { ...req.query };
 
@@ -12,6 +11,29 @@ const advancedResults = (model, populate) => async (req, res, next) => {
   // Loop over removeFields and delete them from reqQuery
   removeFields.forEach(param => delete reqQuery[param]);
 
+   Object.keys(reqQuery).map((element) => {
+    console.log(element);
+     if(reqQuery[element] == ''){
+      delete reqQuery[element]
+     }else if(typeof(reqQuery[element]) == 'object'){
+       var obj = reqQuery[element];
+      Object.keys(obj).map((nestedelement) => {
+         if(obj[nestedelement] == ''){
+          delete obj[nestedelement]
+         }
+       });
+       
+       reqQuery[element] = obj;
+       if(JSON.stringify(obj)==='{}'){
+        delete reqQuery[element]
+       }
+     }
+     
+   });
+
+     
+  console.log(reqQuery);
+  
   // Create query string
   let queryStr = JSON.stringify(reqQuery);
 
@@ -95,6 +117,7 @@ const advancedResults = (model, populate) => async (req, res, next) => {
   if (populate) {
     query = query.populate(populate);
   }
+
 
   // Executing query
   const results = await query;

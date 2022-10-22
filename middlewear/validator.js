@@ -36,7 +36,7 @@ const userRegistrationValidation = [
             email : req.body.email
         }).then(user => {
             if (user) {
-                return Promise.reject('email is already registered');
+                return Promise.reject('This email is already registered');
             }
         })
         }),

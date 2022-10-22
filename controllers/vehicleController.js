@@ -6,19 +6,17 @@ const asyncHandler = require('../middlewear/async');
 var fs = require('fs');
 
 var deleteImages = (images,papers,insurance) => {
+    var directory = __dirname.replace("controllers", "");
     images?.map((path)=>{
-        var directory = __dirname.replace("controllers", "");
-        path=path.replace("http://localhost:8000",directory);
+       path = path.replace("http://localhost:8000",directory);
         fs.unlinkSync(path);
     });
     papers?.map((path)=>{
-        var directory = __dirname.replace("controllers", "");
-        path=path.replace("http://localhost:8000",directory);
+        path = path.replace("http://localhost:8000",directory);
         fs.unlinkSync(path);
     });
     insurance?.map((path)=>{
-        var directory = __dirname.replace("controllers", "");
-        path=path.replace("http://localhost:8000",directory);
+        path = path.replace("http://localhost:8000",directory);
         fs.unlinkSync(path);
     });
 }
@@ -150,7 +148,7 @@ exports.addVehicle = asyncHandler(async (req,res) => {
     }
     else
     {
-        deleteImages(imagePaths,vehiclePapersImagePaths,vehicleInsuranceImagesPaths);
+        //deleteImages(imagePaths,vehiclePapersImagePaths,vehicleInsuranceImagesPaths);
         return res.status(400).json({Success:false,Message:'vehicle images not provided, atleast 1 image is required', responseCode :400});
     }
     
