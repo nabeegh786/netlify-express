@@ -12,7 +12,6 @@ const advancedResults = (model, populate) => async (req, res, next) => {
   removeFields.forEach(param => delete reqQuery[param]);
 
    Object.keys(reqQuery).map((element) => {
-    console.log(element);
      if(reqQuery[element] == ''){
       delete reqQuery[element]
      }else if(typeof(reqQuery[element]) == 'object'){
@@ -22,7 +21,6 @@ const advancedResults = (model, populate) => async (req, res, next) => {
           delete obj[nestedelement]
          }
        });
-       
        reqQuery[element] = obj;
        if(JSON.stringify(obj)==='{}'){
         delete reqQuery[element]
@@ -32,8 +30,20 @@ const advancedResults = (model, populate) => async (req, res, next) => {
    });
 
      
-  console.log(reqQuery);
-  
+  if(typeof(reqQuery["pickupLocation"]) != "undefined"){
+     if(reqQuery["pickupLocation"].includes(",")){
+      var coordinates  = reqQuery["pickupLocation"].split(",");
+      const latitude = Number(coordinates[0].trim());
+      const longitude = Number(coordinates[1].trim());
+      if(checkLatitude(latitude) && checkLongitude(longitude)){
+      reqQuery["pickupLocation"] =  {  $geoWithin:{ $centerSphere: [ [longitude,latitude], 5 / 6378.1 ] }}
+      }else{
+        delete reqQuery["pickupLocation"]
+      }
+     }else{
+      delete reqQuery["pickupLocation"]
+    }
+  }
   // Create query string
   let queryStr = JSON.stringify(reqQuery);
 
@@ -43,10 +53,19 @@ const advancedResults = (model, populate) => async (req, res, next) => {
   //{registrationNumber:["BVAS-007","CVAS-007"]}
   //{registrationNumber:{$in:["BVAS-007","CVAS-007"]}}
   // Finding resource
+
+
   
   query = model.find(JSON.parse(queryStr));
 
-
+//   obj.push({ pickupLocation:
+//     { 
+//         $geoWithin:
+//     { 
+//         $centerSphere: [ [67.14913749903725,24.938159813999892], 5 / 6378.1 ] 
+//         }
+//     }
+// })
   // Select Fields
   if (req.query.select) {
     const fields = req.query.select.split(',').join(' ');
@@ -67,6 +86,7 @@ const advancedResults = (model, populate) => async (req, res, next) => {
         var fieldValue = index[1].split(',');
         item[fieldName] = fieldValue;
         obj.push(item);
+        
 
       });
       query = query.find({ $and: obj });
@@ -148,5 +168,11 @@ const advancedResults = (model, populate) => async (req, res, next) => {
 
   next();
 };
+const checkLatitude = (latitude) => {
+  return isFinite(latitude) && Math.abs(latitude) <= 90;
+};
 
+const checkLongitude = (longitude) => {
+  return isFinite(longitude) && Math.abs(longitude) <= 180;
+};
 module.exports = advancedResults;
