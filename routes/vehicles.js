@@ -47,14 +47,9 @@ router.route('/vehiclecategory')
                          return res.status(400).json({Success:false,Message:err.message, responseCode : 500});      
                         }else{
                          // Everything went fine.
-<<<<<<< HEAD
-                         next();
-                        }
-=======
                         next();
                         }
                        
->>>>>>> f116591b0f873ab5a5c383d06c308aa9c35635a2
                 })
         }, vehicleCategoriesValidation, addVehicleCategories);
 
@@ -72,15 +67,9 @@ router.route('/vehiclecategory/:id')
                           // An unknown error occurred when uploading.
                           return res.status(500).json({Success:false,Message:err.message, responseCode : 500});      
                         }else{
-<<<<<<< HEAD
-                          // Everything went fine.
-                          next();
-                   }
-=======
                         // Everything went fine.
                         next();
                         }
->>>>>>> f116591b0f873ab5a5c383d06c308aa9c35635a2
                 })
                     
         }, vehicleCategoriesValidation, addVehicleCategories)
