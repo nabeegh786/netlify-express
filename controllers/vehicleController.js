@@ -6,17 +6,19 @@ const asyncHandler = require('../middlewear/async');
 var fs = require('fs');
 
 var deleteImages = (images,papers,insurance) => {
-    var directory = __dirname.replace("controllers", "");
     images?.map((path)=>{
-       path = path.replace("http://localhost:8000",directory);
+        var directory = __dirname.replace("controllers", "");
+        path=path.replace("http://localhost:8000",directory);
         fs.unlinkSync(path);
     });
     papers?.map((path)=>{
-        path = path.replace("http://localhost:8000",directory);
+        var directory = __dirname.replace("controllers", "");
+        path=path.replace("http://localhost:8000",directory);
         fs.unlinkSync(path);
     });
     insurance?.map((path)=>{
-        path = path.replace("http://localhost:8000",directory);
+        var directory = __dirname.replace("controllers", "");
+        path=path.replace("http://localhost:8000",directory);
         fs.unlinkSync(path);
     });
 }
@@ -109,7 +111,26 @@ exports.getNearByVehicles = asyncHandler(async (req,res)=>{
 
 
 exports.getVehicles = asyncHandler(async (req,res) => {
-    res.status(200).json({Payload : res.advancedResults, responseCode :200});
+
+    const count = res.advancedResults.count;
+    const status = count > 0 ? 200 : 404;
+    const success = count > 0 ? true : false;
+
+    if(typeof(req.query.pickupLocation) != 'undefined' && req.query.pickupLocation != '' ){
+        return res.status(status).json({
+            Success      : success,
+            Message      : count === 1 ? `only ${count} nearby vehicle found`: count === 0 ? 'no nearby vehicles found' : `Total ${count} nearby vehicles found`  ,
+            Payload      : res.advancedResults,
+            responseCode : count === 0 ? 404 : 200
+        });
+    }
+
+    return res.status(status).json({
+        Success      : success,
+        Message      : count > 0 ? 'Showing results for search' : 'no records found' ,
+        Payload      : res.advancedResults,
+        responseCode : count === 0 ? 404 : 200
+    });
 });
 
 exports.getVehicleById = asyncHandler(async (req,res)=>{
@@ -148,7 +169,7 @@ exports.addVehicle = asyncHandler(async (req,res) => {
     }
     else
     {
-        //deleteImages(imagePaths,vehiclePapersImagePaths,vehicleInsuranceImagesPaths);
+        deleteImages(imagePaths,vehiclePapersImagePaths,vehicleInsuranceImagesPaths);
         return res.status(400).json({Success:false,Message:'vehicle images not provided, atleast 1 image is required', responseCode :400});
     }
     
@@ -158,18 +179,12 @@ exports.addVehicle = asyncHandler(async (req,res) => {
     }
     if(vehiclePapersImagePaths.length<1){
         deleteImages(imagePaths,vehiclePapersImagePaths,vehicleInsuranceImagesPaths);
-        return res.status(400).json({Success:false,Message:'vehicle paper images not provided, atleast 1 vhicle paper image is required', responseCode :400});
+        return res.status(400).json({Success:false,Message:'vehicle paper images not provided, atleast 1 vehicle paper image is required', responseCode :400});
     }
     if(vehicleInsuranceImagesPaths.length<1){
         deleteImages(imagePaths,vehiclePapersImagePaths,vehicleInsuranceImagesPaths);
         return res.status(400).json({Success:false,Message:'vehicle insurance paper images not provided, atleast 1 vehicle insurance paper image is required', responseCode :400});
     }
-    
-
-
-
-
-
 
      //handling validation errors
     const errors = validationResult(req);
@@ -224,7 +239,8 @@ exports.addVehicle = asyncHandler(async (req,res) => {
                     isAvailableForSelfDrive  : req.body.isAvailableForSelfDrive,
                     selfDriveCharges         : selfDriveCharges,
                     withDriverCharges        : withDriverCharges
-                    } )
+                
+                } )
 
                     vehicle.save()
                     .then((vehicle)=>{

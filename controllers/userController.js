@@ -167,7 +167,7 @@ exports.validateUser = asyncHandler(async (req,res,nex) => {
 // alert(d.getMinutes() + ':0' + d.getSeconds()); //12:05
 
 
-exports.userJob = asyncHandler(async (req,res,nex) => {
+exports.userJob = asyncHandler(async (req,res,next) => {
     let i = 0;
     let timeObject = new Date(); 
     timeObject = new Date(timeObject.getTime() + 1000 * 10);
