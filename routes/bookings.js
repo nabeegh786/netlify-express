@@ -7,7 +7,7 @@ const { addBookingValidation } = require('../middlewear/validator');
 
 router.route(`/`)
       .post(addBookingValidation,addBooking)
-      .get(advancedResults(Booking),getBookings)
+      .get(advancedResults(Booking,'vehicle renter rentee'),getBookings)
 
 
 // router.route(`/:id`)

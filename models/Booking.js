@@ -50,10 +50,10 @@ const bookingSchema = mongoose.Schema({
         type:Number,
         required: true,
     },
-    selfDrive:{ // false means with driver , true means self drive
-        type:Boolean,
-        required:true
-    },
+    // selfDrive:{ // false means with driver , true means self drive
+    //     type:Boolean,
+    //     required:true
+    // },
     renteeLocation: {
         type: [{
             lat : Number,

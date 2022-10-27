@@ -4,6 +4,8 @@ const {isValidObjectId} = require('mongoose');
 const {validationResult} = require('express-validator');
 const asyncHandler = require('../middlewear/async');
 const schedule = require('node-schedule');
+const Moment = require('moment');
+const MomentRange = require('moment-range');
 
 
 //booking confirm ki API banani hai 
@@ -75,8 +77,23 @@ exports.addBooking = asyncHandler(async (req,res) => {
 });
 
 exports.getBookings = asyncHandler(async (req,res) => {
+    if(req.query.dates){
+   
+    const moment = MomentRange.extendMoment(Moment);
+    var dates = [];
+    res.advancedResults.data.map((booking) => {
+        const start = new Date(booking.startTime), end = new Date(booking.endTime)
+        const range = moment.range(moment(start.setDate(start.getDate() + 1)), moment(end.setDate(end.getDate() + 1)));
+        Array.from(range.by('day')).map((date)=>{
+            dates.push(date);
+        });
+    });
+
+    return res.status(200).json({Success:true,Message:'Showing Booking Dates',Payload:dates , responseCode : 200});
+   }else{
     const bookings = res.advancedResults;
     return res.status(200).json({Success:true,Message:'Showing Bookings',Payload:bookings , responseCode : 200});
+   }
 });
 
 
