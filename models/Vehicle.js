@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 
 const vehicleSchema = mongoose.Schema({
     vehicleOwner: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId, 
         ref: 'User',
         required: true
     },
@@ -135,7 +135,7 @@ const vehicleSchema = mongoose.Schema({
             required: true
         }
 
-    },
+    },//0 means pending , 1 rejected, 2 means rejected
     approvalStatus: {
         type: String,
         default: '0'

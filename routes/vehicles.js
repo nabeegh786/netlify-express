@@ -81,7 +81,7 @@ router.route(`/getnearbyvehicles`)
                 getNearByVehicles)
 
 router.route(`/`) 
-        .get(advancedResults(Vehicle, 'vehicleCategory'),getVehicles)
+        .get(advancedResults(Vehicle, 'vehicleCategory vehicleOwner'),getVehicles)
         .post((req,res,next) => {
                 uploadOptionsVehicles.fields(
                         [

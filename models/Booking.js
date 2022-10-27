@@ -41,7 +41,7 @@ const bookingSchema = mongoose.Schema({
         default:false
     },
     rentalStatus:{
-        //0 for neverbooked , 1 means booked, 2 means cancelled, 3 coull not be completed after booking confirmed, 4 means rental completed successfully
+        //0 for neverbooked or bokking confirmed by renter , 1 means booked or bookign confirmed by renter, 2 means cancelled by renter, 3 could not be completed after booking confirmed by renter, 4 means rental completed successfully
         type:String,
         length:1,
         default:'0'
@@ -50,15 +50,19 @@ const bookingSchema = mongoose.Schema({
         type:Number,
         required: true,
     },
-    selfDrive:{ // 0 means with driver , 1 means self drive
-        type:Boolean,
-        required:true
-    },
+    // selfDrive:{ // false means with driver , true means self drive
+    //     type:Boolean,
+    //     required:true
+    // },
     renteeLocation: {
         type: [{
             lat : Number,
             lng : Number
         }]
+    },
+    rentalDuration:{
+        type : Number,
+        required : true
     }
     
 },

@@ -201,20 +201,22 @@ const vehicleRegistrationValidation = [
     }),
 
     //Reason For Rejection
-    check('approvalStatus').custom((value) => {
-        if(value == 'Rejected'){
-            check('reasonForRejection').custom((reason) => {
+   // check('approvalStatus').custom((value) => {
+    check('approvalStatus').custom((value, {req, loc, path}) => {
+        if(value == '1'){
+            // check('reasonForRejection').custom((reason) => {
+                var reason = req.body.reasonForRejection 
                 if(reason == '' || reason == null || typeof(reason) == 'undefined'){
                     Promise.reject('Reason for Rejection not provided')
                 }
-            })
+            //})
         }
         return true;
     })
 ]
 
 const getNearByVehiclesValidation = [
-    checkBodyAndQuery('pickupLocation').custom((value) => {
+    check('pickupLocation').custom((value) => {
         let pickupLocation = value.toString().split(',');
         if(pickupLocation.length != 2){
             return Promise.reject('the pickup location is not in a correct Format like => "latitude,"longitude"');
@@ -228,13 +230,70 @@ const getNearByVehiclesValidation = [
     })
 ]
 
+const addBookingValidation = [
+    check('rentee'  ,'rentee Id is not valid').isMongoId(),
+    check('vehicle'  ,'vehicle Id is not valid').isMongoId(),
+//    check('selfDrive'  ,'selfDrive must be either true or false').isBoolean(),
+    check('startTime').custom((value, {req, loc, path}) => {
+        value = new Date(req.body.startTime);
+        timeNow = new Date();
+        timeLimit = new Date(timeNow.getTime() + 1000 * 7200 * 2);
+        if(value.getTime() < timeLimit.getTime()){
+            return Promise.reject('Vehicle Rental Start Time should be atleast after 4 hours at the time of booking');
+        }
+        const endTime = new Date(value.getTime() + 1000 * 3600 * 24);
+        endTimeValue = new Date(req.body.endTime);
+        if(endTimeValue.getTime()<endTime.getTime()){
+            return Promise.reject('Total period of rental should be more than a day');
+        }
+        return true;
+      
+    })
+   
+]
 module.exports = {
     userRegistrationValidation,
     userLoginValidation,
     vehicleRegistrationValidation,
     getNearByVehiclesValidation,
-    vehicleCategoriesValidation
+    vehicleCategoriesValidation,
+    addBookingValidation
 }
+
+
+
+
+
+
+
+
+// check('startTime').custom((value) => {
+//     value = new Date(value);
+//     timeNow = new Date();
+//     timeLimit = new Date(timeNow.getTime()+1000*7200*2);
+//     if(value.getTime() < timeLimit.getTime()){
+//         return Promise.reject('Vehicle Rental Start Time should be atleast after 4 hours at the time of booking');
+//     }else{
+//     check('endTime').custom((endTimeValue) => {
+//         const endTime = new Date(value.getTime()+1000*3600*24);
+//         endTimeValue = new Date(endTimeValue);
+//         if(endTimeValue.getTime()<endTime.getTime()){
+//             return Promise.reject('Vehicle cannot be rented for less than a day');
+//         }
+//         return true;
+//     });
+// }
+//     return true;
+// })
+
+
+
+
+
+
+
+
+
 
 // const userLoginValidation = [
 //     check('username').custom((username, {req, loc, path}) => {
