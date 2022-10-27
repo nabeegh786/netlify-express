@@ -3,6 +3,7 @@ const {VehicleCategory} = require('../models/VehicleCategory');
 const {Vehicle} = require('../models/Vehicle');
 const {check} = require('express-validator');
 const { buildCheckFunction } = require('express-validator');
+const { isValidObjectId } = require('mongoose');
 const checkBodyAndQuery = buildCheckFunction(['body', 'query']);
 
 
@@ -251,13 +252,30 @@ const addBookingValidation = [
     })
    
 ]
+
+const getBookingsValidation = [
+   // check('vehicle','Invalid Vehicle Id').not().isMongoId()
+   check('vehicle').custom((value, {req, loc, path}) => {
+       let boo = isValidObjectId(value);
+       if(!boo){
+        return  Promise.reject('Invalid Vehicle Id');
+       }
+       return true;
+   })
+]
+
+
+
+
+
 module.exports = {
     userRegistrationValidation,
     userLoginValidation,
     vehicleRegistrationValidation,
     getNearByVehiclesValidation,
     vehicleCategoriesValidation,
-    addBookingValidation
+    addBookingValidation,
+    getBookingsValidation
 }
 
 

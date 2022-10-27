@@ -77,19 +77,30 @@ exports.addBooking = asyncHandler(async (req,res) => {
 });
 
 exports.getBookings = asyncHandler(async (req,res) => {
+    
     if(req.query.dates){
-   
+    let hasVehicle = false;
+    let vehicle;
+    if (req.query.vehicle) {
+        if (!isValidObjectId(req.query.vehicle)) {
+            return res.status(400).json({ Success: false, Message: 'invalid vehicle id', responseCode :400 });
+        }
+        // return res.status(400).json({ Success: false, Message: 'vehicle id not provided', responseCode :400 });
+        vehicle = await Vehicle.findOne({_id : req.query.vehicle}).populate('vehicleOwner vehicleCategory');           
+        hasVehicle = true;
+    }
+
     const moment = MomentRange.extendMoment(Moment);
     var dates = [];
     res.advancedResults.data.map((booking) => {
-        const start = new Date(booking.startTime), end = new Date(booking.endTime)
+        const start = new Date(booking.startTime), end = new Date(booking.endTime);
         const range = moment.range(moment(start.setDate(start.getDate() + 1)), moment(end.setDate(end.getDate() + 1)));
         Array.from(range.by('day')).map((date)=>{
             dates.push(date);
         });
     });
-
-    return res.status(200).json({Success:true,Message:'Showing Booking Dates',Payload:dates , responseCode : 200});
+    res.advancedResults.data = hasVehicle ? {dates : dates , vehicle : vehicle} : {dates : date};
+    return res.status(200).json({Success:true,Message:'Showing Booking Dates',Payload:res.advancedResults , responseCode : 200});
    }else{
     const bookings = res.advancedResults;
     return res.status(200).json({Success:true,Message:'Showing Bookings',Payload:bookings , responseCode : 200});
