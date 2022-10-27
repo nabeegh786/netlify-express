@@ -58,14 +58,6 @@ const advancedResults = (model, populate) => async (req, res, next) => {
   
   query = model.find(JSON.parse(queryStr));
 
-//   obj.push({ pickupLocation:
-//     { 
-//         $geoWithin:
-//     { 
-//         $centerSphere: [ [67.14913749903725,24.938159813999892], 5 / 6378.1 ] 
-//         }
-//     }
-// })
   // Select Fields
   if (req.query.select) {
     const fields = req.query.select.split(',').join(' ');
