@@ -1,23 +1,24 @@
 var nodemailer = require('nodemailer');
 
-var transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth:{
+const sendEmail = async options => {
+    var transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth:{
+            user:'sp19bscs0007@maju.edu.pk',
+            pass:'Nabeegh123'
+        }
+    });
 
-        user:'nabeegh77mumtaz@gmail.com',
-        pass:'Nabeegh123'
+    var mailOptions =  {
+        from : 'RentWheels',
+        to:'nabeegh77mumtaz@gmail.com',
+        subject:'test email',
+        text:'Rentwheels test email'
+
     }
-});
+    const info = await transporter.sendMail(mailOptions);
 
-var mailOptions =  {
-    from : 'RentWheels',
-    to:'sp19bscs0007@maju.edu.pk',
-    subject:'test email',
-    text:'test email'
-
+    console.log('Message sent: %s', info.messageId);
 }
-// transporter.sendMail({
-//     mailOptions, function(params) {
-        
-//     }
-// });
+
+module.exports = sendEmail;

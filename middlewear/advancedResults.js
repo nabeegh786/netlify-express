@@ -1,5 +1,4 @@
-const {validationResult} = require('express-validator');
-const date = require('date-and-time')
+const Moment = require('moment');
 
 const advancedResults = (model, populate) => async (req, res, next) => {
   let query;
@@ -43,17 +42,16 @@ const advancedResults = (model, populate) => async (req, res, next) => {
       }
      }else{
       delete reqQuery["pickupLocation"]
-    }
+    } 
   }
 
   //{$and: [ {_id : req.query.vehicle}, { startTime: { $gt: currentDate } } , { rentalStatus : { $ne : '2' } }]}
 
   if(req.query.dates){
-    var start = new Date();
+    let start = new Date();
     start.setHours(0,0,0,0);
-    
-    
-    reqQuery["startTime"] =  "2022-10-20T19:00:00.000Z";
+    let date = Moment(start).format('YYYY-MM-DD');
+    reqQuery["startTime"] =  { gte: '2022-11-03' } ;
     reqQuery["rentalStatus"] = { $ne : '2' };
   }
 

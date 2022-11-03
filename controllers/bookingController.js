@@ -99,7 +99,7 @@ exports.getBookings = asyncHandler(async (req,res) => {
             dates.push(date);
         });
     });
-    res.advancedResults.data = hasVehicle ? {dates : dates , vehicle : vehicle} : {dates : date};
+    res.advancedResults.data = hasVehicle ? {dates : dates , vehicle : vehicle} : {dates : dates};
     return res.status(200).json({Success:true,Message:'Showing Booking Dates',Payload:res.advancedResults , responseCode : 200});
    }else{
     const bookings = res.advancedResults;
