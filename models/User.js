@@ -26,6 +26,11 @@ const userSchema = mongoose.Schema({
     isRenter:{
         type:Boolean,
         default:false
+    },
+    role:{
+        type:String,
+        default:'user',
+        max:5
     }
 },{ timestamps: true })
 

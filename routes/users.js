@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { getUsers, addUser, login, promoteUserToRenter, isfaceMatched, validateUser, userJob, isValidCred } = require('../controllers/userController');
 const { userLoginValidation, userRegistrationValidation } = require('../middlewear/validator');
-const protect = require('../middlewear/auth');
+const {protect, authorize} = require('../middlewear/auth');
 const compare = require('../middlewear/faceComparision');
 
 

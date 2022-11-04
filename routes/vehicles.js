@@ -26,11 +26,18 @@ const advancedResults = require('../middlewear/advancedResults');
 
 const { Vehicle } = require('../models/Vehicle');
 
+// Include other resource routers
+const reviewRouter = require('../routes/reviews');
+
 
 require('dotenv/config');
 
 
 // http://localhost:8000/api/v1/vehicles
+
+
+// Re-route into other resource routers
+router.use('/:vehicleId/reviews', reviewRouter);
 
 router.route('/vehiclecategory')
         .get(getVehicleCategories)
@@ -52,6 +59,8 @@ router.route('/vehiclecategory')
                        
                 })
         }, vehicleCategoriesValidation, addVehicleCategories);
+
+
 
 router.route('/vehiclecategory/:id')
         .get(getVehicleCategories)
@@ -75,10 +84,14 @@ router.route('/vehiclecategory/:id')
         }, vehicleCategoriesValidation, addVehicleCategories)
         .delete(deleteVehicleCategories);
 
+
+
 router.route(`/getnearbyvehicles`)
         .get(getNearByVehiclesValidation,
                 advancedResults(Vehicle, 'vehicleCategory'),
                 getNearByVehicles)
+
+
 
 router.route(`/`) 
         .get(advancedResults(Vehicle, 'vehicleCategory vehicleOwner'),getVehicles)
@@ -118,7 +131,14 @@ router.route(`/`)
         }
         , vehicleRegistrationValidation,addVehicle)
 
+
+
 router.route(`/:id`)
-        .get(getVehicleById)
+        .get(getVehicleById);
+
+
+
+
+
 
  module.exports = router;

@@ -72,7 +72,7 @@ const vehiclesStorage = multer.diskStorage({
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
         const extension = file.mimetype.toLowerCase().split('/')[1];
         cb(null, `${fileName}-${uniqueSuffix}.${extension}`);
-        // cb(null, `${fileName}-${uniqueSuffix}.jpg`);
+       
     }
 })
 

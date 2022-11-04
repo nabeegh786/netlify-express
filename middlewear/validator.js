@@ -239,12 +239,14 @@ const addBookingValidation = [
         value = new Date(req.body.startTime);
         timeNow = new Date();
         timeLimit = new Date(timeNow.getTime() + 1000 * 7200 * 2);
-        if(value.getTime() < timeLimit.getTime()){
-            return Promise.reject('Vehicle Rental Start Time should be atleast after 4 hours at the time of booking');
+        if(value.getTime() < timeLimit.getTime())
+        {
+            return Promise.reject('Rental Start Time should be atleast after 4 hours at the time of booking');
         }
         const endTime = new Date(value.getTime() + 1000 * 3600 * 24);
         endTimeValue = new Date(req.body.endTime);
-        if(endTimeValue.getTime()<endTime.getTime()){
+        if(endTimeValue.getTime()<endTime.getTime())
+        {
             return Promise.reject('Total period of rental should be more than a day');
         }
         return true;

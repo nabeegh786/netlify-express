@@ -4,7 +4,7 @@ const { isValidObjectId } = require('mongoose');
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const setCookie = require('../helpers/cookieHandler');
+const setCookie = require('../helpers/cookieHandler'); 
 const schedule = require('node-schedule');
 const sendEmail = require('../helpers/nodeMailer');
 
@@ -58,13 +58,6 @@ exports.isValidCred = asyncHandler(async (req,res)=>{
 });
 
 exports.addUser = asyncHandler(async (req, res, next) => {
-
-   
-    // const checkIfUserExists = await User.findOne({ username: req.body.username });
-
-    // if (checkIfUserExists) {
-    //     return res.status(400).json({ Success: false, Message: 'Username is already taken, try something else' , responseCode :400});
-    // }
 
     let user = new User({
         username: req.body.username,
