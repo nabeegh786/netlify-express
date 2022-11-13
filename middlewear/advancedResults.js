@@ -51,7 +51,7 @@ const advancedResults = (model, populate) => async (req, res, next) => {
     let start = new Date();
     start.setHours(0,0,0,0);
     let date = Moment(start).format('YYYY-MM-DD');
-    reqQuery["startTime"] =  { gte: '2022-11-03' } ;
+    reqQuery["startTime"] =  { gte: date } ;
     reqQuery["rentalStatus"] = { $ne : '2' };
   }
 

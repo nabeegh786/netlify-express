@@ -37,7 +37,7 @@ exports.getNearByVehicles = asyncHandler(async (req,res)=>{
     var query;
     // filter Fields
     if (req.query.filter) {
-         // query = query.find({ $and: [ { registrationNumber : ["BVAS-007","CVAS-007","NILE-007"]}, { noOfDoors : ["0","2"] } ] });
+
         if (req.query.filter.includes('||')) {
         const fieldsWithValues = req.query.filter.split('||');
         var obj = [];
@@ -105,8 +105,6 @@ exports.getNearByVehicles = asyncHandler(async (req,res)=>{
         responseCode : count === 0 ? 404 : 200
     }
     );
-
-    //return res.status(404).json({Success:false,Message:'No nearby vehicles found', responseCode :404});
 })
 
 
@@ -198,96 +196,34 @@ exports.addVehicle = asyncHandler(async (req,res) => {
     const pickupLocationGeoJson = {type:"Point",coordinates:coordinatesArray};
 
 
+    const vehicle = new Vehicle( {
+        vehicleOwner             : req.body.vehicleOwner,
+        vehicleCategory          : req.body.vehicleCategory,
+        brand                    : req.body.brand,
+        model                    : req.body.model,
+        year                     : req.body.year,
+        registrationNumber       : req.body.registrationNumber,
+        vehicleType              : req.body.vehicleType,
+        pickupLocation           : pickupLocationGeoJson,
+        description              : req.body.description,
+        noOfSeats                : req.body.noOfSeats,
+        fuelType                 : req.body.fuelType,
+        noOfAirbags              : req.body.noOfAirbags,
+        isAutomatic              : req.body.isAutomatic,
+        noOfDoors                : req.body.noOfDoors,
+        isAircondition           : req.body.isAircondition,
+        images                   : imagePaths,
+        vehiclePapers            : vehiclePapersImagePaths,
+        vehicleInsurance         : vehicleInsuranceImagesPaths,
+        isAvailableForSelfDrive  : req.body.isAvailableForSelfDrive,
+        selfDriveDailyCharges    : Number(req.body.selfDriveDailyCharges)
+        });
 
+        vehicle.save()
+        .then((vehicle)=>{
+        return  res.status(200).json({Success:true,Message:'Vehile added Successfully',Payload:vehicle, responseCode : 200});
+    } );
 
-
-
-
-
-    
-    //inserting vehicle in database
-    if(req.body.isAvailableForSelfDrive == 'true' || req.body.isAvailableForSelfDrive == 'false')
-    {
-        if(req.body.isAvailableForSelfDrive == 'true'){
-            const selfDriveCharges  = { 
-                    selfDriveHourlyCharges   : Number(req.body.selfDriveHourlyCharges),
-                    selfDriveDailyCharges    : Number(req.body.selfDriveDailyCharges),
-                    selfDriveWeeklyCharges   : Number(req.body.selfDriveWeeklyCharges),
-                    selfDriveMonthlyCharges  : Number(req.body.selfDriveMonthlyCharges)
-                }
-                const withDriverCharges = {
-                    withDriverDailyCharges   : Number(req.body.withDriverDailyCharges),
-                    withDriverWeeklyCharges  : Number(req.body.withDriverWeeklyCharges),
-                    withDriverMonthlyCharges : Number(req.body.withDriverMonthlyCharges)
-                }
-                const vehicle = new Vehicle( {
-                    vehicleOwner             : req.body.vehicleOwner,
-                    vehicleCategory          : req.body.vehicleCategory,
-                    registrationNumber       : req.body.registrationNumber,
-                    vehicleType              : req.body.vehicleType,
-                    pickupLocation           : pickupLocationGeoJson,
-                    description              : req.body.description,
-                    noOfSeats                : req.body.noOfSeats,
-                    fuelType                 : req.body.fuelType,
-                    noOfAirbags              : req.body.noOfAirbags,
-                    isAutomatic              : req.body.isAutomatic,
-                    noOfDoors                : req.body.noOfDoors,
-                    isAircondition           : req.body.isAircondition,
-                    images                   : imagePaths,
-                    vehiclePapers            : vehiclePapersImagePaths,
-                    vehicleInsurance         : vehicleInsuranceImagesPaths,
-                    isAvailableForSelfDrive  : req.body.isAvailableForSelfDrive,
-                    selfDriveCharges         : selfDriveCharges,
-                    withDriverCharges        : withDriverCharges
-                
-                } )
-
-                    vehicle.save()
-                    .then((vehicle)=>{
-                    return  res.status(200).json({Success:true,Message:'Vehile added Successfully',Payload:vehicle, responseCode : 200});
-                } )
-            }
-            
-            if(!(req.body.isAvailableForSelfDrive == "true")){
-            const withDriverCharges = {
-                withDriverDailyCharges       : Number(req.body.withDriverDailyCharges),
-                withDriverWeeklyCharges      : Number(req.body.withDriverWeeklyCharges),
-                withDriverMonthlyCharges     : Number(req.body.withDriverMonthlyCharges)
-            }
-            
-            const vehicle = new Vehicle({
-                vehicleOwner                 : req.body.vehicleOwner,
-                vehicleCategory              : req.body.vehicleCategory,
-                registrationNumber           : req.body.registrationNumber,
-                vehicleType                  : req.body.vehicleType,
-                pickupLocation               : pickupLocationGeoJson,
-                description                  : req.body.description,
-                noOfSeats                    : req.body.noOfSeats,
-                fuelType                     : req.body.fuelType,
-                noOfAirbags                  : req.body.noOfAirbags,
-                isAutomatic                  : req.body.isAutomatic,
-                noOfDoors                    : req.body.noOfDoors,
-                isAircondition               : req.body.isAircondition,
-                images                       : imagePaths,
-                vehiclePapers                : vehiclePapersImagePaths,
-                vehicleInsurance             : vehicleInsuranceImagesPaths,
-                isAvailableForSelfDrive      : req.body.isAvailableForSelfDrive,
-                selfDriveCharges             : null,
-                withDriverCharges            : withDriverCharges
-                })
-
-                vehicle.save()
-                .then((vehicle) => {
-                return  res.status(200).json({Success:true,Message:'Vehicle added Successfully',Payload:vehicle , responseCode : 200});
-                })
-            }
-
-        }
-        else
-        {
-            deleteImages(imagePaths,vehiclePapersImagePaths,vehicleInsuranceImagesPaths);
-            return res.status(400).json({Success:false,Message:'is Available for self drive info not provided', responseCode : 400});
-        }
 })
 
 

@@ -2,20 +2,7 @@ const mongoose = require('mongoose');
 
 
 const vehicleCategorySchema = mongoose.Schema({
-    brand:{
-        type:String,
-        required:true
-    },
-    model:{
-        type:String,
-        required:true,
-        unique:true
-    },
-    year:{
-        type:String,
-        required:true
-    },
-     vehicleType:{
+   vehicleType:{
         type:String,
          required:true
      },

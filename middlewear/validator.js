@@ -71,18 +71,16 @@ const userLoginValidation = [
 ]
  
 const vehicleCategoriesValidation = [
-    check('brand').not().isEmpty().withMessage('vehicle brand not provided'),
-    check('model').not().isEmpty().withMessage('vehicle model not provided'),
-    check('model').custom((value, {req, loc, path}) => {
+    
+    check('vehicleType').custom((value, {req, loc, path}) => {
         return VehicleCategory.findOne({
             model : req.body.model
         }).then(model => {
             if (model) {
-                return Promise.reject(`Vehicle Model = "${req.body.model}" already exists`)
+                return Promise.reject(`Vehicle Type = ${req.body.vehicleType} already exists`)
             }
         })
-        }),
-    check('year').not().isEmpty().withMessage('vehicle model year not provided').isNumeric().withMessage('vehicle model year should be numeric only'),
+        })
     
 ]
 
@@ -118,6 +116,16 @@ const vehicleRegistrationValidation = [
 
     //vehicle Type
     check('vehicleType').not().isEmpty().withMessage('vehicle type not provided'),
+
+    //brand
+    check('brand').not().isEmpty().withMessage('vehicle brand not provided'),
+
+    //model
+    check('model').not().isEmpty().withMessage('vehicle model not provided'),
+
+    //year
+    check('year').not().isEmpty().withMessage('vehicle model year not provided'),
+
     //registration no
     check('registrationNumber'  ,'vehicle registration no is not provided').not().isEmpty(),
     check('registrationNumber'  ,'vehicle registration no should be atleast 5 characters long').isLength({min:5}),
@@ -174,32 +182,9 @@ const vehicleRegistrationValidation = [
     check('isAircondition' ,'Vehicle air condition info not provided').not().isEmpty(),
     check('isAircondition' ,'Vehicle air condition info should be in boolean form').isBoolean(),
 
-    //is Available for self Drive
-    check('isAvailableForSelfDrive' ,'vehicle self drive availabilty info not provided').not().isEmpty(),
-    check('isAvailableForSelfDrive' ,'vehicle self drive availabilty info should be in boolean form').isBoolean(),
-
-    //with driver charges
-    check('withDriverDailyCharges'   ,'with driver, daily rental charges of vehicle not provided').not().isEmpty(),
-    check('withDriverDailyCharges'   ,'with driver, daily rental charges of vehicle should be in numeric form').isNumeric(),
-    check('withDriverWeeklyCharges'  ,'with driver, weekly rental charges of vehicle not provided').not().isEmpty(),
-    check('withDriverWeeklyCharges'  ,'with driver, weekly rental charges of vehicle should be in numeric form').isNumeric(),
-    check('withDriverMonthlyCharges' ,'with driver, monthly rental charges of vehicle not provided').not().isEmpty(),
-    check('withDriverMonthlyCharges' ,'with driver, monthly rental charges of vehicle should be in numeric form').isNumeric(),
-
     //self drive charges
-    check('isAvailableForSelfDrive').custom((value) => {
-       if(value == 'true') {
-        check('selfDriveHourlyCharges'  ,'self drive, hourly rental charges of vehicle not provided').not().isEmpty()
-        check('selfDriveHourlyCharges'  ,'self drive, hourly rental charges of vehicle should be in numeric form').isNumeric(),
-        check('selfDriveDailyCharges'   ,'self drive, daily rental charges of vehicle not provided').not().isEmpty(),
-        check('selfDriveDailyCharges'   ,'self drive, daily rental charges of vehicle should be in numeric form').isNumeric(),
-        check('selfDriveWeeklyCharges'  ,'self drive, weekly rental charges of vehicle not provided').not().isEmpty(),
-        check('selfDriveWeeklyCharges'  ,'self drive, weekly rental charges of vehicle should be in numeric form').isNumeric(),
-        check('selfDriveMonthlyCharges' ,'self drive, monthly rental charges of vehicle not provided').not().isEmpty(),
-        check('selfDriveMonthlyCharges' ,'self drive, monthly rental charges of vehicle should be in numeric form').isNumeric()
-       }
-       return true;
-    }),
+    check('selfDriveDailyCharges'   ,'self drive, daily rental charges of vehicle not provided').not().isEmpty(),
+       
 
     //Reason For Rejection
    // check('approvalStatus').custom((value) => {

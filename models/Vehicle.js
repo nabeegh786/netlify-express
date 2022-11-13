@@ -13,6 +13,19 @@ const vehicleSchema = mongoose.Schema({
         ref: 'VehicleCategory',
         required: true
     },
+    brand:{
+        type:String,
+        required:true
+    },
+    model:{
+        type:String,
+        required:true,
+        unique:true
+    },
+    year:{
+        type:String,
+        required:true
+    },
     registrationNumber: {
         type: String,
         required: true,
@@ -101,41 +114,10 @@ const vehicleSchema = mongoose.Schema({
         validate: [arrayLimit, 'no of vehicle-insurance images exceeded the limit of 10'],
         required: true
     },
-    isAvailableForSelfDrive: {
-        type: Boolean,
-        required: true
+    selfDriveDailyCharges: {
+        type: Number
     },
-    selfDriveCharges: {
-        selfDriveHourlyCharges: {
-            type: Number
-        },
-        selfDriveDailyCharges: {
-            type: Number
-        },
-        selfDriveWeeklyCharges: {
-            type: Number
-        },
-        selfDriveMonthlyCharges: {
-            type: Number
-        }
-
-    },
-    withDriverCharges: {
-
-        withDriverDailyCharges: {
-            type: Number,
-            required: true
-        },
-        withDriverWeeklyCharges: {
-            type: Number,
-            required: true
-        },
-        withDriverMonthlyCharges: {
-            type: Number,
-            required: true
-        }
-
-    },//0 means pending , 1 rejected, 2 means rejected
+    //0 means pending , 1 rejected, 2 means rejected
     approvalStatus: {
         type: String,
         default: '0'

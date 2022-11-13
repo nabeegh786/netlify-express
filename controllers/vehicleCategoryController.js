@@ -52,9 +52,6 @@ exports.addVehicleCategories = asyncHandler(async (req, res, next) =>{
         const vehicleCategory = await VehicleCategory.findByIdAndUpdate(
             req.params.id,
             {   
-                brand        : req.body.brand,
-                model        : req.body.model,
-                year         : req.body.year,
                 vehicleType  : req.body.vehicleType,
                 image        : basePath+fileName
             } 
@@ -77,9 +74,6 @@ exports.addVehicleCategories = asyncHandler(async (req, res, next) =>{
 
     //for adding vehicle category
     let vehicleCategory = new VehicleCategory({
-        brand       : req.body.brand,
-        model       : req.body.model,
-        year        : req.body.year,
         vehicleType : req.body.vehicleType,
         image       : basePath+fileName
     });
