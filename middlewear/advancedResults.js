@@ -71,6 +71,8 @@ const advancedResults = (model, populate) => async (req, res, next) => {
   
   query = model.find(JSON.parse(queryStr));
 
+  query2 = model.find(JSON.parse(queryStr));
+
   // Select Fields
   if (req.query.select) {
     const fields = req.query.select.split(',').join(' ');
@@ -129,13 +131,14 @@ const advancedResults = (model, populate) => async (req, res, next) => {
   } else {
     query = query.sort('-createdAt');
   }
-
+  
   // Pagination
   const page = parseInt(req.query.page, 10) || 1;
   const limit = parseInt(req.query.limit, 10) || 25;
   const startIndex = (page - 1) * limit;
   const endIndex = page * limit;
   const total = await model.countDocuments();
+
 
   query = query.skip(startIndex).limit(limit);
 
@@ -146,7 +149,8 @@ const advancedResults = (model, populate) => async (req, res, next) => {
 
   // Executing query
   const results = await query;
-
+  const totalCountQuery = await query2.countDocuments();
+  
   // Pagination result
   const pagination = {};
 
@@ -166,6 +170,7 @@ const advancedResults = (model, populate) => async (req, res, next) => {
 
   res.advancedResults = {
     success: true,
+    total : totalCountQuery,
     count: results.length,
     pagination,
     data: results

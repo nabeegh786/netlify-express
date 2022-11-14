@@ -41,7 +41,7 @@ const bookingSchema = mongoose.Schema({
         default:false
     },
     rentalStatus:{
-        //0 for neverbooked or bokking confirmed by renter , 1 means booked or bookign confirmed by renter, 2 means cancelled by renter, 3 could not be completed after booking confirmed by renter, 4 means rental completed successfully
+        //0 for neverbooked or pending , 1 means booked or bookign confirmed by renter, 2 means cancelled by renter, 3 could not be completed after booking confirmed by renter, 4 means rental completed successfully
         type:String,
         length:1,
         default:'0'
