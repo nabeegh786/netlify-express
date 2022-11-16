@@ -1,6 +1,6 @@
 var nodemailer = require('nodemailer');
 
-const sendEmail = async () => {
+exports.sendEmail = async function(email,subject,body){
     var transporter = nodemailer.createTransport({
         service: 'gmail',
         auth:{
@@ -11,9 +11,9 @@ const sendEmail = async () => {
 
     var mailOptions =  {
         from : 'RentWheels',
-        to: 'nabeegh77mumtaz@gmail.com',
-        subject: 'Reset Password',
-        text: 'Rentwheels test email'
+        to: email,
+        subject: subject,
+        text: body
     }
     
     const info = await transporter.sendMail(mailOptions);
@@ -21,4 +21,3 @@ const sendEmail = async () => {
     console.log('Message sent: %s', info.messageId);
 }
 
-module.exports = sendEmail;

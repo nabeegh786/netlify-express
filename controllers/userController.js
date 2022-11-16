@@ -6,7 +6,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const setCookie = require('../helpers/cookieHandler'); 
 const schedule = require('node-schedule');
-const sendEmail = require('../helpers/nodeMailer');
+
 
 
 
@@ -107,7 +107,6 @@ exports.login = asyncHandler(async (req, res, next) => {
 
         });
         setCookie('jwt_token', token, req, res);
-        sendEmail();
         return res.status(200).json({ Success: true, Message: 'User logged in successfully', Payload: data , responseCode :200});
     }
     return res.status(400).json({ Success: false, Message: 'Incorrect Password', responseCode :400 });

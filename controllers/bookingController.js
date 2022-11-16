@@ -23,7 +23,7 @@ exports.addBooking = asyncHandler(async (req,res) => {
     let totalAmount = 0;
     let noOfDays = await days(startDatetime,enddDatetime);
     const vehicle = await Vehicle.findById(req.body.vehicle);
-    totalAmount = vehicle.selfDriveCharges.selfDriveDailyCharges * noOfDays;
+    totalAmount = vehicle.selfDriveDailyCharges * noOfDays;
     // if(selfDrive == 'true' || selfDrive == true)
     // {
     //     totalAmount = vehicle.selfDriveCharges.selfDriveDailyCharges * noOfDays;
@@ -71,7 +71,7 @@ exports.addBooking = asyncHandler(async (req,res) => {
     if(!booking){
         return  res.status(500).json({Success:true,Message:'something went wrong cant request booking', responseCode : 500}); 
     }
-    return res.status(200).json({Success:true,Message:'Booking request send successfully, you will be notified when the renter confirms or rejects the Booking request in 2 hours',Payload:booking , responseCode : 200});
+    return res.status(200).json({Success:true,Message:'Booking request sent successfully, you will be notified when the renter confirms or rejects the Booking request in 2 hours',Payload:booking , responseCode : 200});
     
     
 });
@@ -85,7 +85,7 @@ exports.getBookings = asyncHandler(async (req,res) => {
         if (!isValidObjectId(req.query.vehicle)) {
             return res.status(400).json({ Success: false, Message: 'invalid vehicle id', responseCode :400 });
         }
-        // return res.status(400).json({ Success: false, Message: 'vehicle id not provided', responseCode :400 });
+       
         vehicle = await Vehicle.findOne({_id : req.query.vehicle}).populate('vehicleOwner vehicleCategory');           
         hasVehicle = true;
     }

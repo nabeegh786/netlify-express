@@ -5,8 +5,14 @@ const { userLoginValidation, userRegistrationValidation } = require('../middlewe
 const {protect, authorize} = require('../middlewear/auth');
 const compare = require('../middlewear/faceComparision');
 
+// Include other resource routers
+const otp = require('../routes/otp');
+
 
 // http://localhost:8000/api/v1/users
+router.use('/otp', otp);
+
+
 
 router.route(`/test`)
       .get(compare, isfaceMatched);
