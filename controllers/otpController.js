@@ -4,6 +4,7 @@ const asyncHandler = require('../middlewear/async');
 const {sendEmail} = require('../helpers/nodeMailer');
 const jwt = require('jsonwebtoken');
 const setCookie = require('../helpers/cookieHandler'); 
+const bcrypt = require('bcryptjs');
 
 
 require('dotenv/config');
@@ -58,7 +59,8 @@ exports.verifyOTP = asyncHandler(async (req,res) => {
     if(otp.user.username != username){
         return res.status(400).json({Success:false,Message : 'Invalid Code', responseCode : 400});
     }
-    if(expired(otp.updatedAt,5000)){
+    var isOtpExpired = await expired(otp.updatedAt,5);
+    if(!isOtpExpired){
         return res.status(400).json({Success:false,Message : 'OTP Code Expired', responseCode : 400});
     }
 
@@ -67,30 +69,45 @@ exports.verifyOTP = asyncHandler(async (req,res) => {
         expiresIn: jwtexpiry // expires in 500s
 
     });
+    
     setCookie('jwt_token', token, req, res);
    
     return res.status(200).json({Success:true,Message : `OTP Code Validated`, responseCode : 200});
    
 });
 
+exports.ChangePassword = asyncHandler(async (req,res) => {
+   
+    var passwordHash = bcrypt.hashSync(req.body.password, +bcryptsecret);
 
+    const updatedUser = await User.findByIdAndUpdate(
+        req.user.id,
+        {
+            passwordHash : passwordHash
+        },
+        { new: true }
+    );
+       
+    if(!updatedUser){
+        return res.status(400).json({Success:false,Message : 'Something went wrong, cannot change password', responseCode : 400});
+    }
 
-//calculate days 
-var days =  asyncHandler( (date_1, date_2) => {
-    let difference =  date_2.getTime()-date_1.getTime();
-    let TotalDays = Math.ceil(difference / (1000 * 3600 * 24));
-    return TotalDays;
+    return res.status(200).json({Success:true,Message : `Password Changed Successfully`, responseCode : 200});
 });
 
-//check if token expired days 
+
+
+//check if token expired  
 var expired =  asyncHandler( (date, expiryDuration) => {
 
-    var TokenExpiryDate =  date;
+    var OtpDate =  date;
     var dateNow = new Date();
     var expiry = expiryDuration*60*1000;
-    var difference = (dateNow - new Date(TokenExpiryDate));
-    if(difference < expiry) {
-        return true
+    var difference = (dateNow - new Date(OtpDate));
+    if(difference < expiry)
+    {
+   
+        return true;
 
     }
     return false;

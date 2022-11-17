@@ -1,7 +1,8 @@
 const express = require('express');
 const {
     forgotPassword,
-    verifyOTP
+    verifyOTP,
+    ChangePassword
 } = require('../controllers/otpController');
 
 
@@ -14,9 +15,13 @@ router
   .route('/forgotpassword')
   .post(forgotPassword);
 
-  router
+router
   .route('/verifyotp')
   .post(verifyOTP);
+
+  router
+  .route('/changepassword')
+  .post(protect, authorize('user'), ChangePassword);
 
 
 

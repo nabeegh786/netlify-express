@@ -251,7 +251,16 @@ const getBookingsValidation = [
    })
 ]
 
-
+const changePasswordValidation = [
+    check('password','Password must be 6 or more characters long').isLength({ min: 6 }),
+    check('confirmPassword').custom((value, {req}) => {
+        if(value != req.body.password){
+            return Promise.reject("Password and its Confirmation didn't match");
+        }
+        return true;
+    }
+    )
+]
 
 
 
