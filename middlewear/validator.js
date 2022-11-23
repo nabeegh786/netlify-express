@@ -74,7 +74,7 @@ const vehicleCategoriesValidation = [
     
     check('vehicleType').custom((value, {req, loc, path}) => {
         return VehicleCategory.findOne({
-            model : req.body.model
+            vehicleType : req.body.vehicleType
         }).then(model => {
             if (model) {
                 return Promise.reject(`Vehicle Type = ${req.body.vehicleType} already exists`)

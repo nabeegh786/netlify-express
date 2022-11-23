@@ -20,7 +20,7 @@ exports.forgotPassword = asyncHandler(async (req,res) => {
     if(username === '' || username == null){
         return res.status(400).json({Success:false,Message : 'username not provided', responseCode : 400});
     }
-    const user = await User.findOne({username : username});
+    const user = await User.findOne({ $or: [{ email: username }, { username: username }] });
     if(!user){
         return res.status(400).json({Success:false,Message : 'Invalid Username', responseCode : 400});
     }
@@ -47,7 +47,7 @@ exports.verifyOTP = asyncHandler(async (req,res) => {
     var username = req.body.username;
     var otpCode = req.body.otp;
     if(username === '' || username == null){
-        return res.status(400).json({Success:false,Message : 'username not provided', responseCode : 400});
+        return res.status(400).json({Success:false,Message : 'username or eamil not provided', responseCode : 400});
     }
     if(otpCode === '' || otpCode == null){
         return res.status(400).json({Success:false,Message : 'OTP not provided', responseCode : 400});
@@ -56,7 +56,7 @@ exports.verifyOTP = asyncHandler(async (req,res) => {
     if(!otp){
         return res.status(400).json({Success:false,Message : 'Invalid Code', responseCode : 400});
     }
-    if(otp.user.username != username){
+    if(otp.user.username != username && otp.user.email != username){
         return res.status(400).json({Success:false,Message : 'Invalid Code', responseCode : 400});
     }
     var isOtpExpired = await expired(otp.updatedAt,5);

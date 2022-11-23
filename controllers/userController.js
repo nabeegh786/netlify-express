@@ -107,6 +107,7 @@ exports.login = asyncHandler(async (req, res, next) => {
 
         });
         setCookie('jwt_token', token, req, res);
+        res.setHeader('jt', token);
         return res.status(200).json({ Success: true, Message: 'User logged in successfully', Payload: data , responseCode :200});
     }
     return res.status(400).json({ Success: false, Message: 'Incorrect Password', responseCode :400 });
@@ -154,11 +155,6 @@ exports.validateUser = asyncHandler(async (req,res,nex) => {
     return res.status(200).json({ Success: true, Message: 'user information is correct', responseCode :200 });
 });
 
-// var d;
-// d = new Date('2014-01-01 10:11:55');
-// alert(d.getMinutes() + ':' + d.getSeconds()); //11:55
-// d.setSeconds(d.getSeconds() + 10);
-// alert(d.getMinutes() + ':0' + d.getSeconds()); //12:05
 
 
 exports.userJob = asyncHandler(async (req,res,next) => {
