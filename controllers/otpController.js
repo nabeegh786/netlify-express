@@ -18,11 +18,11 @@ const jwtexpiry = process.env.JWT_EXPIRY;
 exports.forgotPassword = asyncHandler(async (req,res) => {
     var username = req.body.username;
     if(username === '' || username == null){
-        return res.status(400).json({Success:false,Message : 'username not provided', responseCode : 400});
+        return res.status(400).json({Success:false,Message : 'username or email not provided', responseCode : 400});
     }
     const user = await User.findOne({ $or: [{ email: username }, { username: username }] });
     if(!user){
-        return res.status(400).json({Success:false,Message : 'Invalid Username', responseCode : 400});
+        return res.status(400).json({Success:false,Message : 'Invalid Username or Email', responseCode : 400});
     }
     var otpCode = Math.round(Math.random() * 1E9).toString().substring(0,5);
    
@@ -35,7 +35,7 @@ exports.forgotPassword = asyncHandler(async (req,res) => {
             if (error) return res.status(500).json({Success:false,Message : 'something went wrong', responseCode : 500});
             
             // if otp saved successfully then send otp code to User via email
-            sendEmail(user.email,'Reset Rentwheels Password',`Forgot your Password? \nEnter this Code => ${otpCode} to change your password.\nThe token will expire in 5 minutes.`);
+            sendEmail(user.email,'Reset Rentwheels Password',`Forgot your Password? \nEnter this Code => ${otpCode} to change your password. The token will expire in 5 minutes.`);
         }
       )
    
