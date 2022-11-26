@@ -47,7 +47,7 @@ exports.verifyOTP = asyncHandler(async (req,res) => {
     var username = req.body.username;
     var otpCode = req.body.otp;
     if(username === '' || username == null){
-        return res.status(400).json({Success:false,Message : 'username or eamil not provided', responseCode : 400});
+        return res.status(400).json({Success:false,Message : 'username or email not provided', responseCode : 400});
     }
     if(otpCode === '' || otpCode == null){
         return res.status(400).json({Success:false,Message : 'OTP not provided', responseCode : 400});

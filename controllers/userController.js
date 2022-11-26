@@ -57,6 +57,11 @@ exports.isValidCred = asyncHandler(async (req,res)=>{
     return res.status(200).json({ Success: true, Message : 'username and email is correct', responseCode :200});
 });
 
+
+exports.verifyUser = asyncHandler(async (req,res)=>{
+    return res.status(200).json({ Success: true, Message : 'User is Authenticated', responseCode :200});
+});
+
 exports.addUser = asyncHandler(async (req, res, next) => {
 
     let user = new User({

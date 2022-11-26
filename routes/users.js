@@ -1,7 +1,17 @@
 const express = require('express');
 const router = express.Router();
-const { getUsers, addUser, login, promoteUserToRenter, isfaceMatched, validateUser, userJob, isValidCred } = require('../controllers/userController');
+const { getUsers,
+       addUser,
+       verifyUser,
+       login, 
+       promoteUserToRenter,
+       isfaceMatched,
+       validateUser,
+       userJob,
+       isValidCred } = require('../controllers/userController');
+
 const { userLoginValidation, userRegistrationValidation } = require('../middlewear/validator');
+
 const {protect, authorize} = require('../middlewear/auth');
 const compare = require('../middlewear/faceComparision');
 
@@ -16,6 +26,9 @@ router.use('/otp', otp);
 
 router.route(`/test`)
       .get(compare, isfaceMatched);
+
+router.route(`/verify`)
+      .get(protect, verifyUser);
 
 router.route(`/validatetoken`)
       .get(protect, (req,res)=> {
