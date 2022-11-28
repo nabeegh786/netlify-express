@@ -5,7 +5,9 @@ const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const setCookie = require('../helpers/cookieHandler'); 
+const {sendNotification} = require('../helpers/notifications'); 
 const schedule = require('node-schedule');
+
 
 
 
@@ -55,6 +57,13 @@ exports.isValidCred = asyncHandler(async (req,res)=>{
         return res.status(400).json({ Success: false, Message: 'email already exists', responseCode :400 });
     }
     return res.status(200).json({ Success: true, Message : 'username and email is correct', responseCode :200});
+});
+
+
+exports.noti = asyncHandler(async (req,res)=>{
+    var firebaseToken = 'eqF-roigSbWhAqWfNR1UbP:APA91bGx8EJzQPB7zT22myij93wLkel7uEV8crnZLtrNSoMbShGSHUFJwHIZu-KT2COWoZxRHeqI1TbemAcZ6ZZ_7l24cF01mt5FIm4wNXYOT_sOFWJh2-WJ1L7ZwZcp9njEXKEpI5Ga';
+    sendNotification('RentWheels Booking Confirmed Notification','Your Booking Has Been Confirmed Check  you booking list for further information', firebaseToken);    
+    return res.status(200).json({ Success: true, Message : 'Notification Sent', responseCode :200});
 });
 
 

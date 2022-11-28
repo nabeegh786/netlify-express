@@ -8,7 +8,8 @@ const { getUsers,
        isfaceMatched,
        validateUser,
        userJob,
-       isValidCred } = require('../controllers/userController');
+       isValidCred,
+      noti } = require('../controllers/userController');
 
 const { userLoginValidation, userRegistrationValidation } = require('../middlewear/validator');
 
@@ -26,6 +27,8 @@ router.use('/otp', otp);
 
 router.route(`/test`)
       .get(compare, isfaceMatched);
+router.route(`/noti`)
+      .get(noti);
 
 router.route(`/verify`)
       .get(protect, verifyUser);
