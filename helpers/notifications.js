@@ -1,32 +1,33 @@
-const fetch = require('node-fetch');
+const serviceAccount = require("./firebase.json");
+const admin = require("firebase-admin");
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+  });
 
 exports.sendNotification = async function(title,subTitle,fcm_token){
    
-    var notification =  {
-        'title' : title,
-        'text' : subTitle
-    }
-    
-    var fcm_tokens = [fcm_token];
+   
+    var image = 'http://localhost:8000/public/images/vehicle-category/as-1669550580504-417054102.png';
+      const tokens = [];
+      tokens.push(fcm_token);
+      admin.messaging().sendMulticast({
+        tokens,
+      notification: {
+        title : title,
+        body : subTitle,
+        imageUrl : image
 
-    var notificationBody = {
-        'notification' : notification,
-        'registration_ids' : fcm_tokens
-    };
-
-    fetch('https://fcm.googleapis.com/fcm/send',{
-        'method' : 'POST',
-        'headers':{
-            'Authorization'   : 'key='+'AAAAJnmrQfs:APA91bFS66ul1p5kW0GS6ma6qca4DlBwm_Vx1DOIaf5UOq-58vVQ9x7WWcKgH9VWQrw70rug0JiiRVPuKMUQ17Qiu7MOFIQZk-I5R3mAXn51Wt1lKJK6pReIXxBFPTgObFkZT4Q5GlGJ',
-            'Content-Type' : 'application/json'
-        },
-        'body':JSON.stringify(notificationBody)
-
-    }).then((msg)=>{
-        console.log("res >>",msg);
-    }).catch((err)=>{
-        console.log(err);
+      },
     })
+    .then((res)=>{
+        console.log(res.responses[0].error);
+    })
+    .catch((err)=>{
+        console.log(err)}
+        );
+   
+ 
+  
 
 }
 

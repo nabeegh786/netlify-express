@@ -28,7 +28,7 @@ router.use('/otp', otp);
 router.route(`/test`)
       .get(compare, isfaceMatched);
 router.route(`/noti`)
-      .get(noti);
+      .post(noti);
 
 router.route(`/verify`)
       .get(protect, verifyUser);
