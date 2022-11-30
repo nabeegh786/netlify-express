@@ -6,6 +6,7 @@ const asyncHandler = require('../middlewear/async');
 const schedule = require('node-schedule');
 const Moment = require('moment');
 const MomentRange = require('moment-range');
+const { find } = require('../models/Review');
 
 
 //booking confirm ki API banani hai 
@@ -108,6 +109,35 @@ exports.getBookings = asyncHandler(async (req,res) => {
 });
 
 
+exports.getMyBookings = asyncHandler(async (req,res) => {
+    
+    var id = req.user.id;
+    var bookings;
+
+    if(req.query.isRenter!='true' && req.query.isRenter!=true  && req.query.isRenter!='false' && req.query.isRenter!= false  ){
+        return res.status(400).json({ Success: false, Message: 'renter or rentee not defined', responseCode :400 });
+    }
+    if(req.query.isRenter!='true' && req.query.isRenter!=true){
+        bookings = await Booking.find({renter : id}).select('-startCode -endCode').populate({ path: 'renter rentee', model: 'User', select: '-passwordHash' }).populate('vehicle');   
+    }
+    if(req.query.isRenter!='false' && req.query.isRenter!=false){
+        bookings = await Booking.find({rentee : id}).populate({ path: 'renter rentee', model: 'User', select: '-passwordHash' }).populate('vehicle');  
+    }
+           
+    var pending =    [];
+    var approved =   [];
+    var rejected =   [];
+    var completed =  [];
+    
+    bookings.map((booking)=>{
+        if(booking.rentalStatus=='0') pending.push(booking);
+        if(booking.rentalStatus=='1') approved.push(booking);
+        if(booking.rentalStatus=='2') rejected.push(booking);
+        if(booking.rentalStatus=='4') completed.push(booking);
+    });
+   
+    return res.status(200).json({Success:true,Message:'Showing your Bookings',Payload:{pending : pending , approved: approved, rejected : rejected, completed : completed} , responseCode : 200});
+});
 
 
 
