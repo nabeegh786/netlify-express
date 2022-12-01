@@ -18,13 +18,41 @@ exports.sendNotification = async function(title,subTitle,fcm_token){
         imageUrl : image
 
       },
-    })
-    .then((res)=>{
-        console.log(res.responses[0].error);
-    })
-    .catch((err)=>{
-        console.log(err)}
-        );
+    }).then((res)=>{
+          console.log("RES ->>",res)
+          // console.log(res.responses[0].error);
+      })
+      .catch((err)=>{
+          console.log("RES ->>",err)}
+          );
+
+          
+    // admin.messaging().sendMulticast({
+    //   tokens,
+    //   data: {
+    //     notifee: JSON.stringify({
+    //       body: 'This message was sent via FCM!',
+    //       android: {
+    //         channelId: 'default',
+    //         actions: [
+    //           {
+    //             title: 'Mark as Read',
+    //             pressAction: {
+    //               id: 'read',
+    //             },
+    //           },
+    //         ],
+    //       },
+    //     }),
+    //   },
+    // })
+    // .then((res)=>{
+    //     console.log("RES ->>",res)
+    //     // console.log(res.responses[0].error);
+    // })
+    // .catch((err)=>{
+    //     console.log("RES ->>",err)}
+    //     );
    
  
   
