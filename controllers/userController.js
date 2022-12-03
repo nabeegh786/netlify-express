@@ -120,9 +120,17 @@ exports.login = asyncHandler(async (req, res, next) => {
             expiresIn: jwtexpiry // expires in 50s
 
         });
+        if(req.body.firebaseToken){
+        await User.findByIdAndUpdate(
+                user._id,
+                {
+                    firebaseToken: req.body.firebaseToken
+                },
+                {new : true}
+            )
+        }
         setCookie('jwt_token', token, req, res);
-        res.setHeader('jt', token);
-        return res.status(200).json({ Success: true, Message: 'User logged in successfully', Payload: data , responseCode :200});
+        return res.status(200).json({ Success: true, Message: 'User logged in successfully', Payload: data , token: token , responseCode :200});
     }
     return res.status(400).json({ Success: false, Message: 'Incorrect Password', responseCode :400 });
 

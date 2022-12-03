@@ -31,7 +31,25 @@ const userSchema = mongoose.Schema({
         type:String,
         default:'user',
         max:5
+    },
+    firebaseToken:{
+        type : String,
+        default : ''
+    },
+    isVerified:{
+        type: Boolean,
+        default:false
+    },
+    verificationID : {
+    type: mongoose.Schema.ObjectId,
+    ref: 'Verification',
+    default : null
+    },
+    profilePicture:{
+        type : String,
+        default : null
     }
+
 },{ timestamps: true })
 
 exports.User = mongoose.model('User',userSchema);

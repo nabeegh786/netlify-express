@@ -43,8 +43,12 @@ const advancedResults = (model, populate) => async (req, res, next) => {
      }else{
       delete reqQuery["pickupLocation"]
     } 
+    //reqQuery["vehicleOwner"] = { $ne : reqQuery["user"] };
   }
-
+  if(typeof(reqQuery["excludeOwner"]) != "undefined"){
+    reqQuery["vehicleOwner"] = { $ne : reqQuery["excludeOwner"]};
+    reqQuery["approvalStatus"] = { $ne : '2' };
+  }
   //{$and: [ {_id : req.query.vehicle}, { startTime: { $gt: currentDate } } , { rentalStatus : { $ne : '2' } }]}
 
   if(req.query.dates){

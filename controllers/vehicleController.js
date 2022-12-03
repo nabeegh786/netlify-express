@@ -2,6 +2,7 @@ const {Vehicle} = require('../models/Vehicle');
 const {isValidObjectId} = require('mongoose');
 const {validationResult} = require('express-validator');
 const asyncHandler = require('../middlewear/async');
+const {sendNotification} = require('../helpers/notifications'); 
 
 var fs = require('fs');
 
@@ -226,4 +227,49 @@ exports.addVehicle = asyncHandler(async (req,res) => {
 
 })
 
+exports.approveOrRejectVehicle = asyncHandler(async (req,res) => {
+    
+    var role = req.user.role;
+    var vehicleID = req.body.vehicleID;
+    var reasonForRejection = req.body.reasonForRejection;
+    var approve = req.body.approve;
 
+    
+    if(vehicleID == '' || vehicleID == null || typeof(vehicleID) == 'undefined' || !isValidObjectId(vehicleID)){
+        return res.status(400).json({ Success: false, Message: 'invalid vehicle ID', responseCode :400 });
+    }
+    
+    if(role =='' || role == null || typeof(role) == 'undefined' || role !='admin'){
+       // return res.status(400).json({ Success: false, Message: 'you cannot approve or reject this vehicle', responseCode :400 });
+    }
+
+   
+    if(approve!='true' && approve!=true  && approve!='false' && approve!= false){
+        return res.status(400).json({ Success: false, Message: 'approve or reject not provided', responseCode :400 });
+    }
+     approve = req.body.approve == 'true' || req.body.approve ==  true ? '1' : '2';  
+     
+     if((reasonForRejection == '' || reasonForRejection == null || typeof(reasonForRejection) == 'undefined') && approve == '2'){
+        return res.status(400).json({ Success: false, Message: 'Please provide the reason for rejection', responseCode :400 });
+    }
+
+    var vehicle = await Vehicle.findById(vehicleID).populate({ path: 'vehicleOwner', model: 'User', select: '-passwordHash' });  
+    
+    if(vehicle == null || typeof(vehicle) == 'undefined' ){
+        return res.status(400).json({ Success: false, Message: 'vehicle with this id does not exist', responseCode :400 });
+    }
+    if(vehicle.approvalStatus != '0'){
+        return res.status(400).json({ Success: false, Message: 'you cannot approve or reject this vehicle', responseCode :400 });
+    }
+
+    Vehicle.findByIdAndUpdate(
+        vehicle._id ,
+        approve == '2' ? { $set: {approvalStatus: approve, reasonForRejection :  reasonForRejection }} : { $set: {approvalStatus: approve}}
+        ,{new : true}
+        ).populate('vehicleOwner').then((vehicle)=>{
+           approve == '1' ? sendNotification('RentWheels Vehicle Approved',`your vehicle has been approved and is now available for rental, Vehicle Registraton Number = ${vehicle.registrationNumber}`, vehicle.vehicleOwner.firebaseToken ) : sendNotification('RentWheels Booking Rejected',`your vehicle has been rejected you can check the reason for rejection in the vehicle details, Vehicle Registration Number = ${vehicle.registrationNumber}`, vehicle.vehicleOwner.firebaseToken ); 
+        })
+    
+        let  Message  = approve == '1' ? 'Approved' : 'Rejected';
+        return res.status(200).json({Success:true,Message:`Vehicle ${Message} Successfully`, responseCode : 200});
+});

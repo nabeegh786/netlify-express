@@ -12,7 +12,7 @@ const { vehicleRegistrationValidation,
         
 const { getVehicleCategories, 
         addVehicleCategories , 
-        deleteVehicleCategories } = require('../controllers/vehicleCategoryController');
+        deleteVehicleCategories} = require('../controllers/vehicleCategoryController');
 
 const uploadOptionsVehicles = multer({storage: vehiclesStorage});
 const uploadOptionsVehicleCategory = multer({storage: vehicleCategoryStorage});
@@ -20,11 +20,14 @@ const uploadOptionsVehicleCategory = multer({storage: vehicleCategoryStorage});
 const { getNearByVehicles, 
         getVehicles, 
         getVehicleById, 
-        addVehicle } = require('../controllers/vehicleController');
+        addVehicle,
+        approveOrRejectVehicle } = require('../controllers/vehicleController');
 
 const advancedResults = require('../middlewear/advancedResults');
 
 const { Vehicle } = require('../models/Vehicle');
+
+const { protect, authorize } = require('../middlewear/auth');
 
 // Include other resource routers
 const reviewRouter = require('../routes/reviews');
@@ -138,7 +141,8 @@ router.route(`/:id`)
 
 
 
-
+router.route(`/approveorrejectvehicle`)
+        .post(protect,authorize('user', 'admin'),approveOrRejectVehicle);
 
 
  module.exports = router;

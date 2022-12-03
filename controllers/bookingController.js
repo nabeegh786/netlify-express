@@ -6,7 +6,8 @@ const asyncHandler = require('../middlewear/async');
 const schedule = require('node-schedule');
 const Moment = require('moment');
 const MomentRange = require('moment-range');
-const { find } = require('../models/Review');
+const {sendNotification} = require('../helpers/notifications'); 
+
 
 
 //booking confirm ki API banani hai 
@@ -51,19 +52,19 @@ exports.addBooking = asyncHandler(async (req,res) => {
     
     let timeObject = new Date();
     //timeObject = new Date(timeObject.getTime() + 1000 * 7200);
-    timeObject = new Date(timeObject.getTime() + 1000 * 50);
+    timeObject = new Date(timeObject.getTime() + 1000 * 7200);
     schedule.scheduleJob(timeObject, () => {
        Booking.findById(booking._id).then((_booking)=>{
             if(!_booking.bookingConfirmed){
-                // Booking.findByIdAndUpdate(
-                //     _booking._id,
-                //     {
-                //         rentalStatus : '1'
-                //     },
-                //     { new: true }
-                // ).then((__bookig)=>{
-                //     console.log(__bookig.rentalStatus+ '<< new status >>');   
-                // });
+                Booking.findByIdAndUpdate(
+                    _booking._id,
+                    {
+                        rentalStatus : '2'
+                    },
+                    { new: true }
+                ).populate('rentee').then((__bookig)=>{
+                    sendNotification('RentWheels Booking Cancelled',`Your Booking Has Been Cancelled due to no response by the Car Owner, Booking id = ${__bookig._id}`, __bookig.rentee.firebaseToken ); 
+                });
              }
          });
     });
@@ -133,14 +134,50 @@ exports.getMyBookings = asyncHandler(async (req,res) => {
         if(booking.rentalStatus=='0') pending.push(booking);
         if(booking.rentalStatus=='1') approved.push(booking);
         if(booking.rentalStatus=='2') rejected.push(booking);
-        if(booking.rentalStatus=='4') completed.push(booking);
+        if(booking.rentalStatus=='3') completed.push(booking);
     });
    
     return res.status(200).json({Success:true,Message:'Showing your Bookings',Payload:{pending : pending , approved: approved, rejected : rejected, completed : completed} , responseCode : 200});
 });
 
 
+exports.approveOrRejectBooking = asyncHandler(async (req,res) => {
+    
+    var id = req.user.id;
+    var bookingID = req.body.bookingID;
+    if(bookingID == '' || bookingID == null || typeof(bookingID) == 'undefined' || !isValidObjectId(bookingID)){
+        return res.status(400).json({ Success: false, Message: 'invalid booking ID', responseCode :400 });
+    }
+    if(id =='' || id == null || typeof(id) == 'undefined'){
+        return res.status(400).json({ Success: false, Message: 'you cannot approve or reject this booking', responseCode :400 });
+    }
 
+    var approve = req.body.approve;
+    if(approve!='true' && approve!=true  && approve!='false' && approve!= false){
+        return res.status(400).json({ Success: false, Message: 'approve or reject not provided', responseCode :400 });
+    }
+     approve = req.body.approve == 'true' || req.body.approve ==  true ? '1' : '2';   
+    var booking = await Booking.findById(bookingID).populate({ path: 'renter rentee', model: 'User', select: '-passwordHash' }).populate('vehicle');  
+    
+    
+    if(booking == null || typeof(booking) == 'undefined' ){
+        return res.status(400).json({ Success: false, Message: 'booking with this id does not exist', responseCode :400 });
+    }
+
+    if(booking.bookingConfirmed == true || booking.rentalStatus != '0'){
+        return res.status(400).json({ Success: false, Message: 'you cannot approve or reject this booking', responseCode :400 });
+    }
+    Booking.findByIdAndUpdate(
+        booking._id ,
+        { $set: { bookingConfirmed: approve == '1' ? true : false, rentalStatus: approve}}
+        ,{new : true}
+        ).populate('rentee').then((booking)=>{
+           approve == '1' ? sendNotification('RentWheels Bookin5g Request Accepted',`Your Booking Request Has Been Accepted by the Car Owner, Booking id = ${booking._id}`, booking.rentee.firebaseToken ) : sendNotification('RentWheels Booking Request Rejected',`Your Booking Request Has Been Rejected by the Car Owner, Booking id = ${booking._id}`, booking.rentee.firebaseToken ); 
+        })
+    
+        let  Message  = approve == '1' ? 'Approved' : 'Rejected';
+        return res.status(200).json({Success:true,Message:`Booking Request ${Message} Successfully`, responseCode : 200});
+});
  
 
 

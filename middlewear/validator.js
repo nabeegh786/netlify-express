@@ -135,7 +135,9 @@ const vehicleRegistrationValidation = [
             registrationNumber : req.body.registrationNumber
         }).then(vehicle => {
             if (vehicle) {
+                if(vehicle.approvalStatus != '2'){
                 return Promise.reject('vehicle with the provided registration no already exists');
+                }
             }
         });
     }), 

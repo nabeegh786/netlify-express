@@ -28,8 +28,7 @@ const vehicleSchema = mongoose.Schema({
     },
     registrationNumber: {
         type: String,
-        required: true,
-        unique: true
+        required: true
     },
     vehicleType:{
         type:String,
@@ -127,9 +126,9 @@ const vehicleSchema = mongoose.Schema({
         default: ''
     },
     averageRating: {
-        type: Number,
-        min: [1, 'Rating must be at least 1'],
-        max: [5, 'Rating must can not be more than 10']
+        type: Number
+        // min: [1, 'Rating must be at least 1'],
+        // max: [5, 'Rating must can not be more than 10']
       },
 },
     {
