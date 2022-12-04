@@ -67,6 +67,27 @@ exports.noti = asyncHandler(async (req,res)=>{
 });
 
 
+
+exports.userVerificatiion = asyncHandler(async (req, res, next) =>{
+     
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({Success:false,Message: errors.array()[0].msg , responseCode :400});
+    }
+    if(!req.file){
+        return res.status(400).json({Success:false,Message: 'category image not provided' , responseCode :400});
+        
+    }
+    const fileName = req.file.filename;
+    const basePath = `${req.protocol}://${req.get('host')}/public/images/verification/`;
+   
+   
+    return  res.status(200).json({Success:true,Message:'image saved at path = '+basePath+fileName, responseCode :200});
+     
+});
+
+
+
 exports.verifyUser = asyncHandler(async (req,res)=>{
     return res.status(200).json({ Success: true, Message : 'User is Authenticated', responseCode :200});
 });
