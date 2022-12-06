@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {addBooking,getBookings,getMyBookings,approveOrRejectBooking} = require('../controllers/bookingController');
+const {addBooking,getBookings,getMyBookings,approveOrRejectBooking,startRental} = require('../controllers/bookingController');
 const advancedResults = require('../middlewear/advancedResults');
 const { Booking } = require('../models/Booking');
 const { addBookingValidation ,getBookingsValidation} = require('../middlewear/validator');
@@ -17,6 +17,10 @@ router.route(`/getmybookings`)
 
 router.route(`/approveorrejectbooking`)
       .post(protect,authorize('user'),approveOrRejectBooking)
+
+
+router.route(`/startrental`)
+      .post(protect,authorize('user'),startRental)
 
 
 // router.route(`/:id`)

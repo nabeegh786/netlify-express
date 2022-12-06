@@ -63,7 +63,7 @@ exports.addBooking = asyncHandler(async (req,res) => {
                     },
                     { new: true }
                 ).populate('rentee').then((__bookig)=>{
-                    sendNotification('RentWheels Booking Cancelled',`Your Booking Has Been Cancelled due to no response by the Car Owner, Booking id = ${__bookig._id}`, __bookig.rentee.firebaseToken ); 
+                    sendNotification('RentWheels Booking Cancelled',`Your Booking Has Been Cancelled due to no response by the Car Owner, Booking id = ${__bookig._id}`, __bookig.rentee.firebaseToken); 
                 });
              }
          });
@@ -156,7 +156,7 @@ exports.approveOrRejectBooking = asyncHandler(async (req,res) => {
     if(approve!='true' && approve!=true  && approve!='false' && approve!= false){
         return res.status(400).json({ Success: false, Message: 'approve or reject not provided', responseCode :400 });
     }
-     approve = req.body.approve == 'true' || req.body.approve ==  true ? '1' : '2';   
+    approve = req.body.approve == 'true' || req.body.approve ==  true ? '1' : '2';   
     var booking = await Booking.findById(bookingID).populate({ path: 'renter rentee', model: 'User', select: '-passwordHash' }).populate('vehicle');  
     
     
@@ -169,7 +169,7 @@ exports.approveOrRejectBooking = asyncHandler(async (req,res) => {
     }
     Booking.findByIdAndUpdate(
         booking._id ,
-        { $set: { bookingConfirmed: approve == '1' ? true : false, rentalStatus: approve}}
+        { $set: { rentalStatus: approve}}
         ,{new : true}
         ).populate('rentee').then((booking)=>{
            approve == '1' ? sendNotification('RentWheels Bookin5g Request Accepted',`Your Booking Request Has Been Accepted by the Car Owner, Booking id = ${booking._id}`, booking.rentee.firebaseToken ) : sendNotification('RentWheels Booking Request Rejected',`Your Booking Request Has Been Rejected by the Car Owner, Booking id = ${booking._id}`, booking.rentee.firebaseToken ); 
@@ -180,7 +180,49 @@ exports.approveOrRejectBooking = asyncHandler(async (req,res) => {
 });
  
 
+exports.startRental = asyncHandler(async (req,res) => {
+    
+    var id = req.user.id;
+    var bookingID = req.body.bookingID;
+    var startCode = req.body.startCode;
+    if(bookingID == '' || bookingID == null || typeof(bookingID) == 'undefined' || !isValidObjectId(bookingID)){
+        return res.status(400).json({ Success: false, Message: 'invalid booking ID', responseCode :400 });
+    }
+    if(id =='' || id == null || typeof(id) == 'undefined'){
+        return res.status(400).json({ Success: false, Message: 'cannot start booking', responseCode :400 });
+    }
+    if(startCode =='' || startCode == null || typeof(startCode) == 'undefined'){
+        return res.status(400).json({ Success: false, Message: 'please provide start code', responseCode :400 });
+    }
 
+    var booking = await Booking.findById(bookingID).populate({ path: 'renter rentee', model: 'User', select: '-passwordHash' }).populate('vehicle');  
+    
+    
+    if(!booking ){
+        return res.status(400).json({ Success: false, Message: 'wrong booking id', responseCode :400 });
+    }
+
+    if(booking.renter._id != id ){
+        return res.status(400).json({ Success: false, Message: 'only car owner can start the booking', responseCode :400 });
+    }
+    if(booking.bookingConfirmed == true || booking.rentalStatus != '1' ){
+        return res.status(400).json({ Success: false, Message: 'cannot start booking, wrong rental status', responseCode :400 });
+    }
+    if(booking.startCode != startCode){
+        return res.status(400).json({ Success: false, Message: 'invalid start code', responseCode :400 });
+    }
+    Booking.findByIdAndUpdate(
+        booking._id ,
+        { $set: {bookingConfirmed: true}}
+        ,{new : true}
+        ).populate('rentee').then((booking)=>{
+          sendNotification('RentWheels Rental Started',`Your Rental Has Been Started by the Car Owner, Booking id = ${booking._id} rental end time = ${booking.endTime}`, booking.rentee.firebaseToken );
+        })
+    
+        
+        return res.status(200).json({Success:true,Message:`Rental Started Successfully`, responseCode : 200});
+});
+ 
 
 //calculate days 
 var days =  asyncHandler( (date_1, date_2) => {
@@ -190,3 +232,4 @@ var days =  asyncHandler( (date_1, date_2) => {
 });
 
 
+//Booking status rental Status ki tarah se horha hai
