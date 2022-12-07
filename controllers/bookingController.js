@@ -172,7 +172,7 @@ exports.approveOrRejectBooking = asyncHandler(async (req,res) => {
         { $set: { rentalStatus: approve}}
         ,{new : true}
         ).populate('rentee').then((booking)=>{
-           approve == '1' ? sendNotification('RentWheels Bookin5g Request Accepted',`Your Booking Request Has Been Accepted by the Car Owner, Booking id = ${booking._id}`, booking.rentee.firebaseToken ) : sendNotification('RentWheels Booking Request Rejected',`Your Booking Request Has Been Rejected by the Car Owner, Booking id = ${booking._id}`, booking.rentee.firebaseToken ); 
+           approve == '1' ? sendNotification('RentWheels Booking Request Accepted',`Your Booking Request Has Been Accepted by the Car Owner, Booking id = ${booking._id}`, booking.rentee.firebaseToken ) : sendNotification('RentWheels Booking Request Rejected',`Your Booking Request Has Been Rejected by the Car Owner, Booking id = ${booking._id}`, booking.rentee.firebaseToken ); 
         })
     
         let  Message  = approve == '1' ? 'Approved' : 'Rejected';
