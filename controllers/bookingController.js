@@ -114,30 +114,79 @@ exports.getMyBookings = asyncHandler(async (req,res) => {
     
     var id = req.user.id;
     var bookings;
-
+    var isBooking = req.query.isBooking;
+    if(isBooking!='true' && isBooking!=true  && isBooking!='false' && isBooking!= false  ){
+        return res.status(400).json({ Success: false, Message: 'booking or rental not specified', responseCode :400 });
+    }
     if(req.query.isRenter!='true' && req.query.isRenter!=true  && req.query.isRenter!='false' && req.query.isRenter!= false  ){
         return res.status(400).json({ Success: false, Message: 'renter or rentee not defined', responseCode :400 });
     }
-    if(req.query.isRenter!='true' && req.query.isRenter!=true){
-        bookings = await Booking.find({renter : id}).select('-startCode -endCode').populate({ path: 'renter rentee', model: 'User', select: '-passwordHash' }).populate('vehicle');   
+    if(req.query.isRenter=='true' || req.query.isRenter==true){
+        bookings = await Booking.find({renter : id}).populate({ path: 'renter rentee', model: 'User', select: '-passwordHash' }).populate('vehicle');   
     }
-    if(req.query.isRenter!='false' && req.query.isRenter!=false){
+    if(req.query.isRenter=='false' || req.query.isRenter==false){
         bookings = await Booking.find({rentee : id}).populate({ path: 'renter rentee', model: 'User', select: '-passwordHash' }).populate('vehicle');  
     }
+    
+    if(isBooking =='true' || isBooking ==true){
+        var pending =    [];
+        var approved =   [];
+        var rejected =   [];
+       
+        bookings.map((booking)=>{
+            if(booking.rentalStatus=='0') {
+                
+                booking.startCode = null;
+                booking.endCode   = null;
+
+                pending.push(booking);
+            }
+            if(booking.rentalStatus=='1') {
+                if(req.query.isRenter ='false' || req.query.isRenter==false){
+                    booking.endCode   = null;
+                    
+                }else{
+                    booking.startCode = null;
+                    booking.endCode   = null;
+                }
+
+                approved.push(booking);
+            }
+            if(booking.rentalStatus=='2') {
+                booking.startCode = null;
+                booking.endCode   = null;
+                rejected.push(booking);
+            }
            
-    var pending =    [];
-    var approved =   [];
-    var rejected =   [];
+        });
+        return res.status(200).json({Success:true,Message:'Showing your Bookings',Payload:{pending : pending , approved: approved, rejected : rejected, completed : completed} , responseCode : 200});
+    }
+    
+
     var completed =  [];
+    var onGoing = [];
     
     bookings.map((booking)=>{
-        if(booking.rentalStatus=='0') pending.push(booking);
-        if(booking.rentalStatus=='1') approved.push(booking);
-        if(booking.rentalStatus=='2') rejected.push(booking);
-        if(booking.rentalStatus=='3') completed.push(booking);
-    });
+        if(booking.rentalStatus=='3'){ 
+            booking.startCode = null;
+            booking.endCode   = null;
+
+                
+            completed.push(booking);
+        }
+        if(booking.rentalStatus=='4') {
+            if(req.query.isRenter ='true' || req.query.isRenter==true){
+                booking.startCode = null;
+            }else{
+                booking.startCode = null;
+                booking.endCode   = null;
+             }
+            onGoing.push(booking);
+        }
+         });
+    return res.status(200).json({Success:true,Message:'Showing your Bookings',Payload:{onGoing : onGoing , completed: completed, responseCode : 200}});
    
-    return res.status(200).json({Success:true,Message:'Showing your Bookings',Payload:{pending : pending , approved: approved, rejected : rejected, completed : completed} , responseCode : 200});
+   
 });
 
 
@@ -169,11 +218,22 @@ exports.approveOrRejectBooking = asyncHandler(async (req,res) => {
     }
     Booking.findByIdAndUpdate(
         booking._id ,
-        { $set: { rentalStatus: approve}}
+        { $set: { rentalStatus: approve, bookingConfirmed : approve == '1' ? true : false}}
         ,{new : true}
         ).populate('rentee').then((booking)=>{
-           approve == '1' ? sendNotification('RentWheels Booking Request Accepted',`Your Booking Request Has Been Accepted by the Car Owner, Booking id = ${booking._id}`, booking.rentee.firebaseToken ) : sendNotification('RentWheels Booking Request Rejected',`Your Booking Request Has Been Rejected by the Car Owner, Booking id = ${booking._id}`, booking.rentee.firebaseToken ); 
-        })
+            console.log(booking);
+            if(booking.rentalStatus == '1'){
+                console.log(booking.vehicle);
+                 Vehicle.findByIdAndUpdate(
+                    booking.vehicle ,
+                    { $set: { isBooked : true}}
+                    ,{new : true}
+                    ).then((vehicle)=>{
+                        console.log("Vehicle is Booked = true ",vehicle.isBooked);
+                    });
+            }
+            approve == '1' ? sendNotification('RentWheels Booking Request Accepted',`Your Booking Request Has Been Accepted by the Car Owner, Booking id = ${booking._id}`, booking.rentee.firebaseToken ) : sendNotification('RentWheels Booking Request Rejected',`Your Booking Request Has Been Rejected by the Car Owner, Booking id = ${booking._id}`, booking.rentee.firebaseToken ); 
+        });
     
         let  Message  = approve == '1' ? 'Approved' : 'Rejected';
         return res.status(200).json({Success:true,Message:`Booking Request ${Message} Successfully`, responseCode : 200});
@@ -205,7 +265,7 @@ exports.startRental = asyncHandler(async (req,res) => {
     if(booking.renter._id != id ){
         return res.status(400).json({ Success: false, Message: 'only car owner can start the booking', responseCode :400 });
     }
-    if(booking.bookingConfirmed == true || booking.rentalStatus != '1' ){
+    if(booking.bookingConfirmed != true || booking.rentalStatus != '1' ){
         return res.status(400).json({ Success: false, Message: 'cannot start booking, wrong rental status', responseCode :400 });
     }
     if(booking.startCode != startCode){
@@ -213,10 +273,10 @@ exports.startRental = asyncHandler(async (req,res) => {
     }
     Booking.findByIdAndUpdate(
         booking._id ,
-        { $set: {bookingConfirmed: true}}
+        { $set: {rentalStatus: '4'}}
         ,{new : true}
         ).populate('rentee').then((booking)=>{
-          sendNotification('RentWheels Rental Started',`Your Rental Has Been Started by the Car Owner, Booking id = ${booking._id} rental end time = ${booking.endTime}`, booking.rentee.firebaseToken );
+          sendNotification('RentWheels Rental Started',`Your Rental Has Been Started by the Car Owner, Booking id = ${booking._id} rental end time = ${booking.endTime}`, booking.rentee.firebaseToken ); 
         })
     
         
