@@ -47,7 +47,8 @@ const advancedResults = (model, populate) => async (req, res, next) => {
   }
   if(typeof(reqQuery["excludeOwner"]) != "undefined"){
     reqQuery["vehicleOwner"] = { $ne : reqQuery["excludeOwner"]};
-    reqQuery["approvalStatus"] = { $ne : '2' };
+    reqQuery["approvalStatus"] = { $eq : '2' };
+    reqQuery["isBooked"] = {$eq : false};
   }
   //{$and: [ {_id : req.query.vehicle}, { startTime: { $gt: currentDate } } , { rentalStatus : { $ne : '2' } }]}
 
@@ -57,6 +58,7 @@ const advancedResults = (model, populate) => async (req, res, next) => {
     let date = Moment(start).format('YYYY-MM-DD');
     reqQuery["startTime"] =  { gte: date } ;
     reqQuery["rentalStatus"] = { $ne : '2' };
+  
   }
 
 
