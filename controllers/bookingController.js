@@ -221,9 +221,7 @@ exports.approveOrRejectBooking = asyncHandler(async (req,res) => {
         { $set: { rentalStatus: approve, bookingConfirmed : approve == '1' ? true : false}}
         ,{new : true}
         ).populate('rentee').then((booking)=>{
-            console.log(booking);
             if(booking.rentalStatus == '1'){
-                console.log(booking.vehicle);
                  Vehicle.findByIdAndUpdate(
                     booking.vehicle ,
                     { $set: { isBooked : true}}
