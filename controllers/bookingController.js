@@ -129,9 +129,9 @@ exports.getMyBookings = asyncHandler(async (req,res) => {
     }
     
     if(isBooking =='true' || isBooking ==true){
-        var pending =    [];
-        var approved =   [];
-        var rejected =   [];
+        var pending     =    [];
+        var approved    =    [];
+        var rejected    =    [];
        
         bookings.map((booking)=>{
             if(booking.rentalStatus=='0') {
@@ -170,8 +170,7 @@ exports.getMyBookings = asyncHandler(async (req,res) => {
         if(booking.rentalStatus=='3'){ 
             booking.startCode = null;
             booking.endCode   = null;
-
-                
+  
             completed.push(booking);
         }
         if(booking.rentalStatus=='4') {
@@ -231,7 +230,7 @@ exports.approveOrRejectBooking = asyncHandler(async (req,res) => {
                     { $set: { isBooked : true}}
                     ,{new : true}
                     ).then((vehicle)=>{
-                        approve == '1' ? sendNotification('RentWheels Booking Request Accepted',`Your Booking Request Has Been Accepted by the Car Owner, Vehicle = ${vehicle.brand} ${vehicle.model} ${vehicle.year}, Registration no = ${vehicle.registrationNumber} Booking id = ${booking._id}`, booking.rentee.firebaseToken ) : sendNotification('RentWheels Booking Request Rejected',`Your Booking Request Has Been Rejected by the Car Owner,, Vehicle = ${vehicle.brand} ${vehicle.model} ${vehicle.year}, Registration no = ${vehicle.registrationNumber},  Booking id = ${booking._id}`, booking.rentee.firebaseToken ); 
+                        approve == '1' ? sendNotification('RentWheels Booking Request Accepted',`Your Booking Request Has Been Accepted by the Car Owner, Vehicle = ${vehicle.brand} ${vehicle.model} ${vehicle.year}, Registration no = ${vehicle.registrationNumber} Booking id = ${booking._id}`, booking.rentee.firebaseToken ) : sendNotification('RentWheels Booking Request Rejected',`Your Booking Request Has Been Rejected by the Car Owner,, Vehicle = ${vehicle.brand} ${vehicle.model} ${vehicle.year}, Registration no = ${vehicle.registrationNumber},  Booking id = ${booking._id}`, booking.rentee.firebaseToken); 
                         success = true;
                         
                     }).catch((error)=>{
@@ -284,7 +283,7 @@ exports.startRental = asyncHandler(async (req,res) => {
         return res.status(400).json({ Success: false, Message: 'invalid start code', responseCode :400 });
     }
 
-    var success  = true;
+    var success  = false;
     var err = "";
     Booking.findByIdAndUpdate(
         booking._id ,
@@ -343,7 +342,7 @@ exports.endRental = asyncHandler(async (req,res) => {
         return res.status(400).json({ Success: false, Message: 'invalid end code', responseCode :400 });
     }
 
-    var success  = true;
+    var success  = false;
     var err = "";
 
     Booking.findByIdAndUpdate(
@@ -358,13 +357,10 @@ exports.endRental = asyncHandler(async (req,res) => {
                 ).then((vehicle)=>{
                     sendNotification('RentWheels Rental Completed',`Your Rental Has Been Completed, Vehicle = ${vehicle.brand} ${vehicle.model} ${vehicle.year}, Registration no = ${vehicle.registrationNumber}, Booking id = ${booking._id} `, booking.rentee.firebaseToken );
                     sendNotification('RentWheels Rental Completed',`Your Rental Has Been Completed by the Renter, Vehicle = ${vehicle.brand} ${vehicle.model} ${vehicle.year} Registration no = ${vehicle.registrationNumber}, Booking id = ${booking._id} `, booking.renter.firebaseToken );  
-                    success = true;
-          
-                    
+                    success = true;  
                 }).catch((error)=>{
                     err = error;
-                    success = false;
-                   
+                    success = false; 
                 });
         });
        
