@@ -18,7 +18,8 @@ const { protect, authorize } = require('../middlewear/auth');
 const { verifyUserValidation} = require('../middlewear/validator');
 
 router.route(`/verifyuser`) 
-    .post((req,res,next) => {
+    .post(protect,authorize('user'),
+        (req,res,next) => {
         uploadOptionsUserVerification.fields(
                 [
                     {
@@ -65,9 +66,9 @@ router.route(`/verifyuser`)
         })
 }
 ,
-//protect,authorize('user'),
-verifyUserValidation,
-compare,
+
+// verifyUserValidation,
+// compare,
  verifyUser)
 
 
