@@ -222,7 +222,7 @@ exports.addVehicle = asyncHandler(async (req,res) => {
 
         vehicle.save()
         .then((vehicle)=>{
-        return  res.status(200).json({Success:true,Message:'Vehile added Successfully',Payload:vehicle, responseCode : 200});
+        return  res.status(200).json({Success:true,Message:'Vehile added Successfully, wait for an admin to approve your vehicle before renting',Payload:vehicle, responseCode : 200});
     } );
 
 })

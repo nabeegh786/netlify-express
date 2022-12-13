@@ -8,7 +8,7 @@ const compare = asyncHandler( async (req, res, next) => {
   
     async function spawnChild() {
         child = require('child_process').execFile(__dirname + '\\compareFace\\compareFace.exe', [
-            req.body.CNIC, req.body.IMG
+            req.body.cnicFront, req.body.image
         ], {
 
             detached: true,

@@ -5,6 +5,7 @@ const {
     ChangePassword
 } = require('../controllers/otpController');
 
+const { changePasswordValidation} = require('../middlewear/validator');
 
 const router = express.Router({ mergeParams: true });
 
@@ -21,7 +22,7 @@ router
 
   router
   .route('/changepassword')
-  .post(protect, authorize('user'), ChangePassword);
+  .post(protect, authorize('user'),changePasswordValidation ,ChangePassword);
 
 
 

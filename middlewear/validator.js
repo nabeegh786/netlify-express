@@ -5,6 +5,8 @@ const {check} = require('express-validator');
 const { buildCheckFunction } = require('express-validator');
 const { isValidObjectId } = require('mongoose');
 const checkBodyAndQuery = buildCheckFunction(['body', 'query']);
+const compare = require('../middlewear/faceComparision');
+var fs = require('fs');
 
 
 
@@ -50,8 +52,7 @@ const userRegistrationValidation = [
     }
     )
 ]
-        
- 
+
 const userLoginValidation = [
      check('username').custom((username, {req, loc, path}) => {
         if(req.body.username === '' || req.body.username === null || typeof(req.body.username)=='undefined') {
@@ -264,7 +265,65 @@ const changePasswordValidation = [
     )
 ]
 
+const changePasswordValidationn = [
+    check('password','Password must be 6 or more characters long').isLength({ min: 6 }),
+    check('confirmPassword').custom((value, {req}) => {
+        if(value != req.body.password){
+            return Promise.reject("Password and its Confirmation didn't match");
+        }
+        return true;
+    }
+    )
+]
 
+
+const verifyUserValidation = async (req, res, next) =>{
+        const files = req.files; 
+        if(typeof(files.cnicFront)=='undefined' || typeof(files.cnicBack)=='undefined' || typeof(files.licenseFront)=='undefined' || typeof(files.licenseBack)=='undefined' || typeof(files.utilityBill)=='undefined' || typeof(files.image)=='undefined'){
+            var missingFields = deleteImages(files);
+            //return res.status(500).json({ Success: false, Message : missingFields+ 'not provided', responseCode :500});
+            return res.status(400).json({Success:false,Message: missingFields+ 'not provided', responseCode :400});
+        }
+        
+            next();       
+   
+};
+
+
+var deleteImages = (files) => {
+    var missingField = "";
+    
+    if(files.cnicFront){
+        var path = files.cnicFront[0].path; 
+        fs.unlinkSync(path);   
+    }else missingField += missingField == "" ? "cnic front " : ", cnic front "; 
+     if(files.cnicBack){
+        var path = files.cnicBack[0].path;
+        fs.unlinkSync(path);
+        
+     }else missingField += missingField == "" ? "cnic back image  " : ", cnic back image "; 
+     if(files.licenseFront){
+        var path = files.licenseFront[0].path; 
+        fs.unlinkSync(path);
+        
+     }else missingField += missingField == "" ? "license front image " : ", license front image "; 
+     if(files.licenseBack){
+        var path = files.licenseBack[0].path; 
+        fs.unlinkSync(path);
+        
+     }else missingField += missingField == "" ? "license back image " : ", license back image "; 
+     if(files.utilityBill){
+        var path = files.utilityBill[0].path; 
+        fs.unlinkSync(path);
+        
+     }else missingField += missingField == "" ? "utility bill image " : ", utility bill image "; 
+     if(files.image){
+        var path = files.image[0].path;
+        fs.unlinkSync(path);
+        
+     }else missingField +=  missingField == "" ? "user verification image " : ", user verification image ";  
+     return missingField;
+    }
 
 module.exports = {
     userRegistrationValidation,
@@ -273,7 +332,9 @@ module.exports = {
     getNearByVehiclesValidation,
     vehicleCategoriesValidation,
     addBookingValidation,
-    getBookingsValidation
+    getBookingsValidation,
+    changePasswordValidation,
+    verifyUserValidation
 }
 
 
