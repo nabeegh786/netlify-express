@@ -29,11 +29,11 @@ exports.verifyUser = asyncHandler(async (req, res, next) => {
    var isfaceMatched = false;
       const formData = new FormData();
 
-      formData.append('image', {
+      formData.append('image', JSON.stringify({
         name: files.image[0].originalname,
         type: files.image[0].mimetype,
         uri:  files.image[0].path ,
-      });
+      }));
 
       let response  = await axios.post('http://192.168.0.105:8000/api/v1/users/verification', formData, {
         headers: { "Content-type": "multipart/form-data" }
