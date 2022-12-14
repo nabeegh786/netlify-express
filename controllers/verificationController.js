@@ -57,7 +57,6 @@ exports.verifyUser = asyncHandler(async (req, res, next) => {
          licenseBack: files.licenseBack[0].path,
          utilityBill: files.utilityBill[0].path,
          image: files.image[0].path,
-         
      })
 
      verification = await verification.save();
