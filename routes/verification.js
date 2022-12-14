@@ -17,9 +17,12 @@ const { protect, authorize } = require('../middlewear/auth');
 
 const { verifyUserValidation} = require('../middlewear/validator');
 
+const multipart = require('connect-multiparty');
+const multipartMiddleware = multipart();
+
 router.route(`/verifyuser`) 
-    .post(protect,authorize('user'),
-        (req,res,next) => {
+    .post((req,res,next) => {
+        
         uploadOptionsUserVerification.fields(
                 [
                     {
@@ -66,9 +69,10 @@ router.route(`/verifyuser`)
         })
 }
 ,
-
+protect,authorize('user'),
 // verifyUserValidation,
 // compare,
+
  verifyUser)
 
 

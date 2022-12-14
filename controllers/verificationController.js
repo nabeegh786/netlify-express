@@ -30,8 +30,8 @@ exports.verifyUser = asyncHandler(async (req, res, next) => {
       const formData = new FormData();
 
       formData.append('image', {
-        name: files.image[0].path.split('/').pop(),
-        type: files.image[0].mime,
+        name: files.image[0].originalname,
+        type: files.image[0].mimetype,
         uri:  files.image[0].path ,
       });
 
