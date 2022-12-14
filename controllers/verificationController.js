@@ -39,7 +39,7 @@ exports.verifyUser = asyncHandler(async (req, res, next) => {
         headers: { "Content-type": "multipart/form-data" }
       });
 
-      if(typeof(response.success)=='undefined'){
+      if(typeof(response.Success)=='undefined'){
          return res.status(500).json({Success:false,Message: 'Something Went Wrong Cannot Verify Account', responseCode :500});
       }
       if(response.success == 'true' || response.success == true){
