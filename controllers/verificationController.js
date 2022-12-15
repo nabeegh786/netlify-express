@@ -27,18 +27,36 @@ exports.verifyUser = asyncHandler(async (req, res, next) => {
    }
    
    var isfaceMatched = false;
-      const formData = new FormData();
+       const formData = new FormData();
 
-      formData.append('image', JSON.stringify({
-        name: files.image[0].originalname,
-        type: files.image[0].mimetype,
-        uri:  files.image[0].path ,
-      }));
+      // const fileStream = await fs.createReadStream(files.image[0].path);
 
-      let response  = await axios.post('http://192.168.0.105:8000/api/v1/users/verification', formData, {
-        headers: { "Content-type": "multipart/form-data" }
+      //   console.log(fileStream);
+
+      // formData.append('files', fileStream, files.image[0].originalname);
+
+      // let response  = await axios.post('http://192.168.0.105:8000/api/v1/users/verification', formData, {
+      //   headers: {...formData.getHeaders()}
+      // });
+
+      // Read image from disk as a Buffer
+ 
+       fs.readFile(files.image[0].path , (err, imgeBuffer) => {
+         if (err) {
+           console.error(err)
+           return
+         }
+        // console.log(imgeBuffer);
+         formData.append('files', imgeBuffer, files.image[0].originalname);
+       })
+      
+
+      
+        let response  = await axios.post('http://192.168.0.105:8000/api/v1/users/verification', formData, {
+        headers: {...formData.getHeaders()}
+       
       });
-
+      
       if(typeof(response.Success)=='undefined'){
          return res.status(500).json({Success:false,Message: 'Something Went Wrong Cannot Verify Account', responseCode :500});
       }
