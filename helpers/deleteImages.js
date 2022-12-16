@@ -1,6 +1,6 @@
 var fs = require('fs');
 
-exports.deleteImages = async function(files){
+exports.deleteImages = async function(files,mode){
     var missingField = "";
     if(mode=='verification'){
     if(files.cnicFront){
