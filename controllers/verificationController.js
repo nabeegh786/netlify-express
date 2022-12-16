@@ -1,15 +1,6 @@
 const asyncHandler = require('../middlewear/async');
-const compare = require('../middlewear/faceComparision');
 const { User } = require('../models/User');
 const { Verification } = require('../models/Verification');
-const { isValidObjectId } = require('mongoose');
-const { validationResult } = require('express-validator');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const setCookie = require('../helpers/cookieHandler'); 
-const {sendNotification} = require('../helpers/notifications'); 
-const schedule = require('node-schedule');
-var fs = require('fs');
 const axios = require('axios')
 var FormData = require('form-data');
 const {deleteImages} = require('../helpers/deleteImages');
