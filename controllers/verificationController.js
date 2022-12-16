@@ -25,42 +25,27 @@ exports.verifyUser = asyncHandler(async (req, res, next) => {
        var missingFields = deleteImages(files);
        return res.status(400).json({Success:false,Message: missingFields+ 'not provided', responseCode :400});
    }
-   
    var isfaceMatched = false;
-       const formData = new FormData();
+   const formData = new FormData();
+   formData.append('files', files.image[0].path, files.image[0].originalname);
+   let response;
 
-      // const fileStream = await fs.createReadStream(files.image[0].path);
-
-      //   console.log(fileStream);
-
-      // formData.append('files', fileStream, files.image[0].originalname);
-
-      // let response  = await axios.post('http://192.168.0.105:8000/api/v1/users/verification', formData, {
-      //   headers: {...formData.getHeaders()}
-      // });
-
-      // Read image from disk as a Buffer
- 
-       fs.readFile(files.image[0].path , (err, imgeBuffer) => {
-         if (err) {
-           console.error(err)
-           return
+   await axios.post('http://127.0.0.1:8000/uploadfile/', formData, {
+         headers: {
+               'Content-Type': `multipart/form-data; boundary=${formData._boundary}`
          }
-        // console.log(imgeBuffer);
-         formData.append('files', imgeBuffer, files.image[0].originalname);
-       })
-      
-
-      
-        let response  = await axios.post('http://192.168.0.105:8000/api/v1/users/verification', formData, {
-        headers: {...formData.getHeaders()}
-       
-      });
+      }).then((responseFromServer2) => {
+         console.log("first",responseFromServer2.data)
+         response = responseFromServer2.data
+         console.log("Sucess ->> ",response.Success);
+      }).catch((err) => {
+         console.log("Err ->>",err)
+      })
       
       if(typeof(response.Success)=='undefined'){
          return res.status(500).json({Success:false,Message: 'Something Went Wrong Cannot Verify Account', responseCode :500});
       }
-      if(response.success == 'true' || response.success == true){
+      if(response.Success == 'true' || response.Success == true){
          isfaceMatched = true;
       }
 
