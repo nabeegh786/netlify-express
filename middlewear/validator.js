@@ -276,54 +276,35 @@ const changePasswordValidationn = [
     )
 ]
 
+const userProfileUpdateValidation = [
+    check('username'         ,'username should be greater than 5 characters').isLength({min:5}),
+    check('username'         ,'username should be less than 30 characters').isLength({max:30}),
+    check('username').custom((value, {req, loc, path}) => {
+        return User.findOne({
+            username : req.body.username,
+            _id : {$ne : req.user._id}
+        }).then(user => {
+            if (user) {
+                return Promise.reject('The username already exists, try something else')
+            }
+        })
+        }),
+    check('phone'            ,'invalid phone no').isMobilePhone(),
+    check('phone'            ,'phone no should not exceed 11 digits').isLength({max:11}),
+    check('email'            ,'Please include a valid email').isEmail(),
+    check('email').custom((value, {req, loc, path}) => {
+        return User.findOne({
+            email : req.body.email,
+            _id : {$ne : req.user._id}
+        }).then(user => {
+            if (user) {
+                return Promise.reject('This email is already registered');
+            }
+        })
+        })
 
-const verifyUserValidation = async (req, res, next) =>{
-        const files = req.files; 
-        if(typeof(files.cnicFront)=='undefined' || typeof(files.cnicBack)=='undefined' || typeof(files.licenseFront)=='undefined' || typeof(files.licenseBack)=='undefined' || typeof(files.utilityBill)=='undefined' || typeof(files.image)=='undefined'){
-            var missingFields = deleteImages(files);
-            //return res.status(500).json({ Success: false, Message : missingFields+ 'not provided', responseCode :500});
-            return res.status(400).json({Success:false,Message: missingFields+ 'not provided', responseCode :400});
-        }
-        
-            next();       
-   
-};
+]
 
-
-var deleteImages = (files) => {
-    var missingField = "";
-    
-    if(files.cnicFront){
-        var path = files.cnicFront[0].path; 
-        fs.unlinkSync(path);   
-    }else missingField += missingField == "" ? "cnic front " : ", cnic front "; 
-     if(files.cnicBack){
-        var path = files.cnicBack[0].path;
-        fs.unlinkSync(path);
-        
-     }else missingField += missingField == "" ? "cnic back image  " : ", cnic back image "; 
-     if(files.licenseFront){
-        var path = files.licenseFront[0].path; 
-        fs.unlinkSync(path);
-        
-     }else missingField += missingField == "" ? "license front image " : ", license front image "; 
-     if(files.licenseBack){
-        var path = files.licenseBack[0].path; 
-        fs.unlinkSync(path);
-        
-     }else missingField += missingField == "" ? "license back image " : ", license back image "; 
-     if(files.utilityBill){
-        var path = files.utilityBill[0].path; 
-        fs.unlinkSync(path);
-        
-     }else missingField += missingField == "" ? "utility bill image " : ", utility bill image "; 
-     if(files.image){
-        var path = files.image[0].path;
-        fs.unlinkSync(path);
-        
-     }else missingField +=  missingField == "" ? "user verification image " : ", user verification image ";  
-     return missingField;
-    }
 
 module.exports = {
     userRegistrationValidation,
@@ -334,7 +315,7 @@ module.exports = {
     addBookingValidation,
     getBookingsValidation,
     changePasswordValidation,
-    verifyUserValidation
+    userProfileUpdateValidation
 }
 
 
@@ -342,50 +323,3 @@ module.exports = {
 
 
 
-
-
-// check('startTime').custom((value) => {
-//     value = new Date(value);
-//     timeNow = new Date();
-//     timeLimit = new Date(timeNow.getTime()+1000*7200*2);
-//     if(value.getTime() < timeLimit.getTime()){
-//         return Promise.reject('Vehicle Rental Start Time should be atleast after 4 hours at the time of booking');
-//     }else{
-//     check('endTime').custom((endTimeValue) => {
-//         const endTime = new Date(value.getTime()+1000*3600*24);
-//         endTimeValue = new Date(endTimeValue);
-//         if(endTimeValue.getTime()<endTime.getTime()){
-//             return Promise.reject('Vehicle cannot be rented for less than a day');
-//         }
-//         return true;
-//     });
-// }
-//     return true;
-// })
-
-
-
-
-
-
-
-
-
-
-// const userLoginValidation = [
-//     check('username').custom((username, {req, loc, path}) => {
-//        if(req.body.username === '' || req.body.username === null || typeof(req.body.username)=='undefined') {
-//        check('email').custom((email, {req, loc, path})=>{
-//            req.body.email.isEmail().normalizeEmail({ gmail_remove_dots: true }).withMessage('Please include a valid email')
-//        })  
-//        }  
-//        else if(req.body.username.length < 5){
-//            return Promise.reject('username should be atleast 5 characters long');
-//        }
-//        return true;
-       
-//     }),
-    
-//     check('password' ,'Password must be 8 or more characters long').isLength({ min: 8 })
-
-// ]

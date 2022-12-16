@@ -9,11 +9,16 @@ const { getUsers,
        validateUser,
        userJob,
        isValidCred,
-       noti } = require('../controllers/userController');
+       noti,
+       updateProfile } = require('../controllers/userController');
 
 
 
-const { userLoginValidation, userRegistrationValidation } = require('../middlewear/validator');
+const { userLoginValidation, userRegistrationValidation, userProfileUpdateValidation } = require('../middlewear/validator');
+
+const multer = require('multer');
+const { userProfileStorage } = require('../middlewear/multerStorage')
+const uploadOptionsUserProfileUpdate = multer({storage: userProfileStorage});
 
 const {protect, authorize} = require('../middlewear/auth');
 const compare = require('../middlewear/faceComparision');
@@ -50,7 +55,7 @@ router.route(`/isvalidcred`)
 
 router.route(`/`)
       .get(protect, getUsers)
-      .post(addUser);
+      .post(userRegistrationValidation,addUser);
 
 router.route(`/validateuserinfo`)
       .post(userRegistrationValidation, validateUser);
@@ -63,6 +68,26 @@ router.route(`/:id`)
 
 router.route(`/login`)
       .post(userLoginValidation, login);
+
+router.route(`/updateprofile`)
+      .post(protect, authorize('user'),(req,res,next) => {
+            uploadOptionsUserProfileUpdate.single('profilePicture')(req, res, function (err) {
+                    if (err instanceof multer.MulterError) {
+                    if(err.message === 'Unexpected field'){
+                            return res.status(400).json({Success:false,Message:'more than 1 image is not allowed for Vehicle Category', responseCode : 400});
+                    }
+                    // A Multer error occurred when uploading
+                    return res.status(500).json({Success:false,Message:err.message, responseCode : 500});
+                    } else if (err) {
+                      // An unknown error occurred when uploading.
+                      return res.status(500).json({Success:false,Message:err.message, responseCode : 500});      
+                    }else{
+                    // Everything went fine.
+                    next();
+                    }
+            })
+                
+    }, userProfileUpdateValidation, updateProfile);
 
 router.route(`promotetorenter/:id`)
       .put(protect, promoteUserToRenter);

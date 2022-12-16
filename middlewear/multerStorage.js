@@ -134,9 +134,36 @@ const userVerificationStorage = multer.diskStorage({
     }
 })
 
+const userProfileStorage = multer.diskStorage({
+
+    destination: function (req, file, cb){
+        const isValid = FILE_TYPE_MAP[file.mimetype];
+        
+        let uploadError = new Error('Invalid Image type, only .png, .jpg, .jpeg files are allowed');
+        var directory =  __dirname.replace("middlewear", "");
+        if(typeof(isValid) != 'undefined')
+        {
+            uploadError = null;
+             
+        }
+        createDir(directory+"public");
+        createDir(directory+"public/images");
+        createDir(directory+"public/images/user-profile");
+        cb(uploadError,directory+"public/images/user-profile");
+    },
+    filename: function(req,file, cb){
+        const fileName = file.originalname.split('.').slice(0, -1).join('.').split(' ').join('-');
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const extension = file.mimetype.split('/')[1].toLowerCase();
+        cb(null, `${fileName}-${uniqueSuffix}.${extension}`);
+    }
+})
+
+
 module.exports = {
     vehiclesStorage,
     vehicleCategoryStorage,
-    userVerificationStorage
+    userVerificationStorage,
+    userProfileStorage
 };
 

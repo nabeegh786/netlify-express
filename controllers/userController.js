@@ -27,7 +27,7 @@ exports.getUsers = asyncHandler(async (req, res, next) => {
             return res.status(400).json({ Success: false, Message: 'invalid user id', responseCode :400 });
         }
         const user = await User.findById(req.params.id)
-            .select('-passwordHash');
+            .select('-passwordHash').populate('verificationID');
 
         if (!user) {
             return res.status(404).json({ Success: false, Message: 'User not found' , responseCode :404})
@@ -36,7 +36,7 @@ exports.getUsers = asyncHandler(async (req, res, next) => {
         return res.status(200).json({Payload : user , responseCode :400});
     }
     const users = await User.find()
-        .select('-passwordHash');
+        .select('-passwordHash').populate('verificationID');
 
     if (!users) {
         return res.status(404).json({ Success: false, Message: 'no user found', responseCode :404 });
@@ -94,6 +94,10 @@ exports.verifyUser = asyncHandler(async (req,res)=>{
 
 exports.addUser = asyncHandler(async (req, res, next) => {
 
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ Success: false, Message: errors.array()[0].msg , responseCode :400});
+    }
     let user = new User({
         username: req.body.username,
         passwordHash: bcrypt.hashSync(req.body.password, +bcryptsecret),
@@ -211,4 +215,28 @@ exports.userJob = asyncHandler(async (req,res,next) => {
     i++;
     return res.send("Job Set");
    
+});
+
+exports.updateProfile = asyncHandler(async (req,res,next) => {
+    const file = req.file; 
+    var fileURL = null;
+    const basePath = `${req.protocol}://${req.get('host')}/public/images/`;
+    if(typeof(file)!='undefined'){
+        fileURL = `${basePath+'user-profile/'}${file.filename}`;
+    }
+    
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ Success: false, Message: errors.array()[0].msg , responseCode :400});
+    }
+
+    let user = await User.findByIdAndUpdate(
+        req.user._id ,
+        { $set: { username : req.body.username, email : req.body.email, phone : req.body.phone, profilePicture : fileURL }}
+        ,{new : true}
+        );
+    
+    if(!user) return res.status(500).json({ Success: false, Message: 'Something Went Wrong Cannot Update Profile' , responseCode :500});
+
+    return res.status(200).json({ Success: true, Message: 'Profile Updated Successfully' , responseCode :200});
 });
