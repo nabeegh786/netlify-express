@@ -78,6 +78,24 @@ exports.verifyUser = asyncHandler(async (req, res, next) => {
 
 });
 
+
+
+
+exports.isVerified = asyncHandler(async (req, res, next) => {
+   var isVerified = req.user.isVerified;
+   
+   if(!isVerified){
+      return res.status(400).json({Success:false,Message: 'your account is not verified', responseCode :400});
+   }
+   return res.status(200).json({Success:true,Message: 'your account is verified', responseCode :200});
+});
+
+
+
+
+
+
+
 var deleteImages = (files) => {
     var missingField = "";
     
