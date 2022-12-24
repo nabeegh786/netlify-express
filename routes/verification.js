@@ -1,7 +1,7 @@
 const express = require('express');
 const {
-    verifyUser
-} = require('../controllers/verificationController');
+    verifyUser,
+    isVerified } = require('../controllers/verificationController');
 
 const compare = require('../middlewear/faceComparision');
 const { userVerificationStorage } = require('../middlewear/multerStorage')
@@ -77,6 +77,7 @@ protect,authorize('user'),
 
 
 
-
+ router.route(`/isverified`) 
+ .get(protect,authorize('user'),isVerified);
 
 module.exports = router;
