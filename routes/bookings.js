@@ -7,7 +7,7 @@ const { addBookingValidation ,getBookingsValidation} = require('../middlewear/va
 const { protect, authorize } = require('../middlewear/auth');
 
 router.route(`/`)
-      .post(addBookingValidation,addBooking)
+      .post(protect, authorize('user'),addBookingValidation,addBooking)
       .get(getBookingsValidation,advancedResults(Booking,'vehicle renter rentee'),getBookings)
 
 

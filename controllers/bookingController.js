@@ -1,5 +1,8 @@
 const {Booking} = require('../models/Booking');
 const {Vehicle} = require('../models/Vehicle');
+const {CardDetails} = require('../models/CardDetails');
+const {Transaction} = require('../models/Transaction');
+const {Payment} = require('../models/Payment');
 const {isValidObjectId} = require('mongoose');
 const {validationResult} = require('express-validator');
 const asyncHandler = require('../middlewear/async');
@@ -14,11 +17,13 @@ const {sendNotification} = require('../helpers/notifications');
 //rental status ki API banani hai 
 exports.addBooking = asyncHandler(async (req,res) => {
 
+    
+
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json({Success:false,Message: errors.array()[0].msg , responseCode :400});
     }
-
+    let renteeId = req.user._id;
     //let selfDrive = req.body.selfDrive;
     let startDatetime = new Date(req.body.startTime);
     let enddDatetime = new Date(req.body.endTime);
@@ -37,7 +42,7 @@ exports.addBooking = asyncHandler(async (req,res) => {
 
     let booking = new Booking({
        renter           :   vehicle.vehicleOwner,
-       rentee           :   req.body.rentee,
+       rentee           :   renteeId,
        vehicle          :   vehicle._id,
        startTime        :   req.body.startTime,
        endTime          :   req.body.endTime,
@@ -70,9 +75,52 @@ exports.addBooking = asyncHandler(async (req,res) => {
     });
 
     booking = await booking.save();
+
     if(!booking){
         return  res.status(500).json({Success:true,Message:'something went wrong cant request booking', responseCode : 500}); 
     }
+
+    
+    let cardDetails = new CardDetails({
+        cardNo             :    req.body.cardNo,
+        cvv                :    req.body.cvv,
+        cardHolderName     :    req.body.cardHolderName,
+        expiry             :    req.body.expiry
+    });
+
+    cardDetails = await cardDetails.save();
+
+    if(!cardDetails){
+        return res.status(500).json({Success:false,Message : `Something Went Wrong Cannot Make Payment`, responseCode : 500});
+    }
+
+    let transaction = new Transaction({
+        fromUser             :    renteeId,
+        toUser               :    booking.renter,
+        transactionDate      :    new Date(),
+        amount               :    totalAmount
+    });
+
+    transaction = await transaction.save();
+
+    if(!transaction){
+        return res.status(500).json({Success:false,Message : `Something Went Wrong Cannot Make Payment`, responseCode : 500});
+    }
+    
+    let payment = new Payment({
+        transactionId        :    transaction._id,
+        cardDetailsId        :    cardDetails._id,
+        bookingId            :    booking._id
+    });
+    payment = await payment.save();
+   
+    if(!payment){
+        return res.status(500).json({Success:false,Message : `Something Went Wrong Cannot Make Payment`, responseCode : 500});
+    }
+
+   
+
+    
     return res.status(200).json({Success:true,Message:'Booking request sent successfully, you will be notified when the renter confirms or rejects the Booking request in 2 hours',Payload:booking , responseCode : 200});
     
     

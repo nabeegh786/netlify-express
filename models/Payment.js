@@ -13,7 +13,7 @@ const PaymentSchema = mongoose.Schema({
         required: true,
         unique : true
     },
-    BookingId: {
+    bookingId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Booking',
         required: true,
