@@ -53,7 +53,7 @@ exports.addBooking = asyncHandler(async (req,res) => {
        rentalDuration   :   noOfDays
      //  renteeLocation   :   req.body.renteeLocation ? req.body.renteeLocation : null
     })
-
+    booking = await booking.save();
     
     let timeObject = new Date();
     //timeObject = new Date(timeObject.getTime() + 1000 * 7200);
@@ -74,7 +74,7 @@ exports.addBooking = asyncHandler(async (req,res) => {
          });
     });
 
-    booking = await booking.save();
+   
 
     if(!booking){
         return  res.status(500).json({Success:true,Message:'something went wrong cant request booking', responseCode : 500}); 
@@ -107,6 +107,8 @@ exports.addBooking = asyncHandler(async (req,res) => {
         return res.status(500).json({Success:false,Message : `Something Went Wrong Cannot Make Payment`, responseCode : 500});
     }
     
+ 
+
     let payment = new Payment({
         transactionId        :    transaction._id,
         cardDetailsId        :    cardDetails._id,

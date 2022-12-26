@@ -10,14 +10,12 @@ const PaymentSchema = mongoose.Schema({
     transactionId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Transaction',
-        required: true,
-        unique : true
+        required: true
     },
     bookingId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Booking',
         required: true,
-        unique : true
     }
    
 },{ timestamps: true })
