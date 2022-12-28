@@ -1,5 +1,6 @@
 const asyncHandler = require('../middlewear/async');
 const { User } = require('../models/User');
+const {Wallet} = require('../models/Wallet');
 const { isValidObjectId } = require('mongoose');
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
@@ -114,6 +115,11 @@ exports.addUser = asyncHandler(async (req, res, next) => {
         phone: user.phone,
         isRenter: user.isRenter
     };
+    var userWallet = new Wallet({
+        user: user._id,
+        balance: 0
+    });
+    await userWallet.save();
     return res.status(200).json({ Success: true, Message: 'user added successfully', Payload: data, responseCode :200 });
 
 });

@@ -20,7 +20,12 @@ const TransactionSchema = mongoose.Schema({
     transactionDate:{
         type:Date,
         required:true
-    }
+    },
+    serviceCharges:{
+        type:Number,
+        required:true,
+        min:0
+    },
    
 },{ timestamps: true })
 

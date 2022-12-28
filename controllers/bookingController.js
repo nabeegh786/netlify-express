@@ -3,6 +3,7 @@ const {Vehicle} = require('../models/Vehicle');
 const {CardDetails} = require('../models/CardDetails');
 const {Transaction} = require('../models/Transaction');
 const {Payment} = require('../models/Payment');
+const {Wallet} = require('../models/Wallet');
 const {isValidObjectId} = require('mongoose');
 const {validationResult} = require('express-validator');
 const asyncHandler = require('../middlewear/async');
@@ -98,7 +99,8 @@ exports.addBooking = asyncHandler(async (req,res) => {
         fromUser             :    renteeId,
         toUser               :    booking.renter,
         transactionDate      :    new Date(),
-        amount               :    totalAmount
+        amount               :    totalAmount-(totalAmount*0.05),
+        serviceCharges       :    totalAmount*0.05
     });
 
     transaction = await transaction.save();
@@ -327,23 +329,23 @@ exports.startRental = asyncHandler(async (req,res) => {
         return res.status(400).json({ Success: false, Message: 'only car owner can start the booking', responseCode :400 });
     }
     if(booking.bookingConfirmed != true || booking.rentalStatus != '1' ){
-        return res.status(400).json({ Success: false, Message: 'cannot start booking, wrong rental status', responseCode :400 });
+        return res.status(400).json({ Success: false, Message: 'wrong rental status or booking is not Confirmed', responseCode :400 });
     }
     if(booking.startCode != startCode){
         return res.status(400).json({ Success: false, Message: 'invalid start code', responseCode :400 });
     }
 
-    var success  = false;
-    var err = "";
-    Booking.findByIdAndUpdate(
+    let success  = false;
+    let err = "";
+    await Booking.findByIdAndUpdate(
         booking._id ,
         { $set: {rentalStatus: '4'}}
         ,{new : true}
-        ).populate('rentee renter')
+        ).populate('rentee renter vehicle')
         .then((booking)=>{
           
-          sendNotification('RentWheels Rental Started',`Your Rental Has Been Started by the Car Owner, Vehicle = ${vehicle.brand} ${vehicle.model} ${vehicle.year}, Registration no = ${vehicle.registrationNumber}, Booking id = ${booking._id}  rental end time = ${Moment(booking.endTime).format('dd-MM-yyyy hh:mm a zzz')}`, booking.rentee.firebaseToken );
-          sendNotification('RentWheels Rental Started',`Your Rental Has Been Started, Vehicle = ${vehicle.brand} ${vehicle.model} ${vehicle.year}, Registration no = ${vehicle.registrationNumber}, Booking id = ${booking._id} rental end time = ${Moment(booking.endTime).format('dd-MM-yyyy hh:mm a zzz')}`, booking.renter.firebaseToken );  
+          sendNotification('RentWheels Rental Started',`Your Rental Has Been Started by the Car Owner, Vehicle = ${booking.vehicle.brand} ${booking.vehicle.model} ${booking.vehicle.year}, Registration no = ${booking.vehicle.registrationNumber}, Booking id = ${booking._id}  rental end time = ${Moment(booking.endTime).format('dd-MM-yyyy hh:mm a zzz')}`, booking.rentee.firebaseToken );
+          sendNotification('RentWheels Rental Started',`Your Rental Has Been Started, Vehicle = ${booking.vehicle.brand} ${booking.vehicle.model} ${booking.vehicle.year}, Registration no = ${booking.vehicle.registrationNumber}, Booking id = ${booking._id} rental end time = ${Moment(booking.endTime).format('dd-MM-yyyy hh:mm a zzz')}`, booking.renter.firebaseToken );  
           success = true;
           
         }).catch((error)=>{
@@ -392,34 +394,58 @@ exports.endRental = asyncHandler(async (req,res) => {
         return res.status(400).json({ Success: false, Message: 'invalid end code', responseCode :400 });
     }
 
-    var success  = false;
-    var err = "";
-
-    Booking.findByIdAndUpdate(
+    
+    let _booking = await Booking.findByIdAndUpdate(
         booking._id ,
         { $set: {rentalStatus: '3', bookingConfirmed : false}}
         ,{new : true}
-        ).populate('rentee renter').then((booking)=>{
-            Vehicle.findByIdAndUpdate(
-                booking.vehicle ,
-                { $set: { isBooked : false}}
-                ,{new : true}
-                ).then((vehicle)=>{
-                    sendNotification('RentWheels Rental Completed',`Your Rental Has Been Completed, Vehicle = ${vehicle.brand} ${vehicle.model} ${vehicle.year}, Registration no = ${vehicle.registrationNumber}, Booking id = ${booking._id} `, booking.rentee.firebaseToken );
-                    sendNotification('RentWheels Rental Completed',`Your Rental Has Been Completed by the Renter, Vehicle = ${vehicle.brand} ${vehicle.model} ${vehicle.year} Registration no = ${vehicle.registrationNumber}, Booking id = ${booking._id} `, booking.renter.firebaseToken );  
-                    success = true;  
-                }).catch((error)=>{
-                    err = error;
-                    success = false; 
-                });
-        });
-       
+        ).populate('rentee renter');
+       if(!booking){
+        return res.status(500).json({Success:false,Message:`Something Went Wrong Cannot End Rental `+err, responseCode : 500});
+       }
+        let vehicle = await Vehicle.findByIdAndUpdate(
+            _booking.vehicle ,
+            { $set: { isBooked : false}}
+            ,{new : true}
+            );
 
-        if(success){
-            return res.status(200).json({Success:true,Message:`Rental Ended Successfully`, responseCode : 200});
-        }else{
-            return res.status(500).json({Success:false,Message:`Something Went Wrong Cannot End Rental `+err, responseCode : 500});
+        sendNotification('RentWheels Rental Completed',`Your Rental Has Been Completed, Vehicle = ${vehicle.brand} ${vehicle.model} ${vehicle.year}, Registration no = ${vehicle.registrationNumber}, Booking id = ${_booking._id} `, _booking.rentee.firebaseToken );
+        sendNotification('RentWheels Rental Completed',`Your Rental Has Been Completed by the Renter, Vehicle = ${vehicle.brand} ${vehicle.model} ${vehicle.year} Registration no = ${vehicle.registrationNumber}, Booking id = ${_booking._id} `, _booking.renter.firebaseToken );  
+
+
+        var wallet = await Wallet.findOne({user: id});
+        var payment = await Payment.findOne({bookingId: _booking._id}).populate('transactionId');
+        if(!payment){
+            return res.status(500).json({Success:false,Message:`Bookings Payment Not found `+err, responseCode : 500});
         }
+        if(!wallet){
+            var userWallet = new Wallet({
+                user: id,
+                balance: payment.transactionId.amount
+            });
+
+            await userWallet.save();
+            sendNotification('RentWheels Rental Completed',`Rental Completed Successfully, Total Rental Amount = ${payment.transactionId.amount} rs has been transfered to your wallet, service charges = ${payment.transactionId.serviceCharges} rs`, booking.renter.firebaseToken );
+        }else{
+        // update the wallet code if already exist else insert
+         Wallet.findOneAndUpdate(
+            { user:  id },
+            { $set: { balance: wallet.balance +payment.transactionId.amount} },
+            { upsert: true, new: true },
+            function(error) {
+                if (error) return res.status(500).json({Success:false,Message : 'something went wrong', responseCode : 500});
+                
+                // if wallet balance updated successfully then send notification to Car owner
+                sendNotification('RentWheels Rental Completed',`Rental Completed Successfully, Total Rental Amount = ${payment.transactionId.amount} rs has been transfered to your wallet, service charges = ${payment.transactionId.serviceCharges} rs`, booking.renter.firebaseToken );
+            })
+
+
+        }
+        
+        
+           
+                return res.status(200).json({Success:true,Message:`Rental Ended Successfully`, responseCode : 200});
+        
 
 });
 

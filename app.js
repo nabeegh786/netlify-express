@@ -43,7 +43,7 @@ app.use(`${api}/payment`, payment);
 
 //Database Connection
 mongoose.connect(process.env.CONNECTON_STRING,{
-    //must add in order to not get any error massages:
+    //must add in order to not get any error massages: mongoDB Password : Nodejs123
     useUnifiedTopology:true,
     useNewUrlParser: true,
     dbName :'eshop-databse',
