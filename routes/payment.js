@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 
 const {
-    makePayment
+  getPayments
 } = require('../controllers/paymentController');
 
 const { paymentValidation } = require('../middlewear/validator');
@@ -13,8 +13,8 @@ const advancedResults = require('../middlewear/advancedResults');
 const { protect, authorize } = require('../middlewear/auth');
 
 router
-  .route('/makepayment')
-  .post(protect, authorize('user'),paymentValidation,makePayment);
+  .route('/getpayments')
+  .get(protect, authorize('user'),getPayments);
 
 
 

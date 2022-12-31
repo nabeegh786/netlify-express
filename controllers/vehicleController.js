@@ -216,7 +216,7 @@ exports.addVehicle = asyncHandler(async (req,res) => {
         images                   : imagePaths,
         vehiclePapers            : vehiclePapersImagePaths,
         vehicleInsurance         : vehicleInsuranceImagesPaths,
-        isAvailableForSelfDrive  : req.body.isAvailableForSelfDrive,
+        isAvailableForSelfDrive  : true,
         selfDriveDailyCharges    : Number(req.body.selfDriveDailyCharges)
         });
 

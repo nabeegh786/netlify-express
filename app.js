@@ -36,7 +36,7 @@ app.use(`${api}/vehicles`,vehiclesRoute);
 app.use(`${api}/bookings`,bookingsRoute);
 app.use(`${api}/reviews`, reviews);
 app.use(`${api}/otp`, otp);
-app.use(`${api}/payment`, payment);
+app.use(`${api}/payments`, payment);
 
 
 
