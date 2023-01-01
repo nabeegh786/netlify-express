@@ -36,14 +36,14 @@ exports.getUsers = asyncHandler(async (req, res, next) => {
 
         return res.status(200).json({Payload : user , responseCode :400});
     }
-    const users = await User.find()
-        .select('-passwordHash').populate('verificationID');
-
-    if (!users) {
+    //const users = await User.find()
+    //    .select('-passwordHash').populate('verificationID');
+    const count = res.advancedResults.count;
+    if (count < 1) {
         return res.status(404).json({ Success: false, Message: 'no user found', responseCode :404 });
     }
     
-    return res.status(200).json({ Success: true, Users: users , responseCode :200});
+    return res.status(200).json({ Success: true, Users: res.advancedResults , responseCode :200});
     
     
 });

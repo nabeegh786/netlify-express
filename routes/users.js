@@ -12,7 +12,7 @@ const { getUsers,
        noti,
        updateProfile } = require('../controllers/userController');
 
-
+const { User } = require('../models/User');
 
 const { userLoginValidation, userRegistrationValidation, userProfileUpdateValidation } = require('../middlewear/validator');
 
@@ -22,6 +22,7 @@ const uploadOptionsUserProfileUpdate = multer({storage: userProfileStorage});
 
 const {protect, authorize} = require('../middlewear/auth');
 const compare = require('../middlewear/faceComparision');
+const advancedResults = require('../middlewear/advancedResults');
 
 // Include other resource routers
 const otp = require('../routes/otp');
@@ -54,7 +55,7 @@ router.route(`/isvalidcred`)
       .post(isValidCred);
 
 router.route(`/`)
-      .get(protect, getUsers)
+      .get(advancedResults(User, 'verificationID'),protect, getUsers)
       .post(userRegistrationValidation,addUser);
 
 router.route(`/validateuserinfo`)
