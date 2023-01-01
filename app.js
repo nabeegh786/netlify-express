@@ -46,7 +46,7 @@ mongoose.connect(process.env.CONNECTON_STRING,{
     //must add in order to not get any error massages: mongoDB Password : Nodejs123
     useUnifiedTopology:true,
     useNewUrlParser: true,
-    dbName :'eshop-databse',
+    dbName :'rent-wheels-database',
 }) 
 .then(()=>{
     console.log('Database connection is ready');
