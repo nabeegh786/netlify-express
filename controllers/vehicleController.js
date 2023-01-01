@@ -9,20 +9,17 @@ var fs = require('fs');
 var deleteImages = (images,papers,insurance, req) => {
     images?.map((path)=>{
         var directory = __dirname.replace("controllers", "");
-        //path=path.replace(`${req.protocol}://${req.get('host')}`,directory);
-        path=path.replace(`${req.protocol}://localhost:8000`,directory);
+        path=path.replace(`${req.protocol}://${req.get('host')}`,directory);
         fs.unlinkSync(path);
     });
     papers?.map((path)=>{
         var directory = __dirname.replace("controllers", "");
-        //path=path.replace(`${req.protocol}://${req.get('host')}`,directory);
-        path=path.replace(`${req.protocol}://localhost:8000`,directory);
+        path=path.replace(`${req.protocol}://${req.get('host')}`,directory);
         fs.unlinkSync(path);
     });
     insurance?.map((path)=>{
         var directory = __dirname.replace("controllers", "");
-        // path=path.replace(`${req.protocol}://${req.get('host')}`,directory);
-        path=path.replace(`${req.protocol}://localhost:8000`,directory);
+        path=path.replace(`${req.protocol}://${req.get('host')}`,directory);
         fs.unlinkSync(path);
     });
 }
@@ -153,8 +150,7 @@ exports.addVehicle = asyncHandler(async (req,res) => {
     let imagePaths = [];
     let vehiclePapersImagePaths = [];
     let vehicleInsuranceImagesPaths = [];
-    //const basePath = `${req.protocol}://${req.get('host')}/public/images/`;
-    const basePath = `${req.protocol}://localhost:8000/public/images/`;
+    const basePath = `${req.protocol}://${req.get('host')}/public/images/`;
     if(files){
         let  filePath  = "";
         files.images?.map((file) => {

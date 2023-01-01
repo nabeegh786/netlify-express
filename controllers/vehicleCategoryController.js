@@ -44,8 +44,7 @@ exports.addVehicleCategories = asyncHandler(async (req, res, next) =>{
         
     }
     const fileName = req.file.filename;
-    // const basePath = `${req.protocol}://${req.get('host')}/public/images/vehicle-category/`;
-    const basePath = `${req.protocol}://localhost:8000/public/images/vehicle-category/`;
+    const basePath = `${req.protocol}://${req.get('host')}/public/images/vehicle-category/`;
    
     //for updating vehicle categories
     if(req.params.id){
@@ -62,8 +61,7 @@ exports.addVehicleCategories = asyncHandler(async (req, res, next) =>{
 
        
         // delete file directory
-        //let delDir = vehicleCategory.image.replace(`${req.protocol}://${req.get('host')}/`,"");
-        let delDir = vehicleCategory.image.replace(`${req.protocol}://localhost:8000/`,"");
+        let delDir = vehicleCategory.image.replace(`${req.protocol}://${req.get('host')}/`,"");
 
         fs.unlink(delDir, function (err) {
             if (err) throw err;
@@ -99,8 +97,7 @@ exports.deleteVehicleCategories = asyncHandler(async (req, res, next) => {
     const vehicleCategory = await VehicleCategory.findByIdAndDelete(req.params.id);
     if(!vehicleCategory) return res.status(404).json({Success : false, Message:'Vehicle Category not found', responseCode :404});
      // delete file directory
-     //let delDir = await vehicleCategory.image.replace(`${req.protocol}://${req.get('host')}/`,"");
-     let delDir = await vehicleCategory.image.replace(`${req.protocol}://localhost:8000/`,"");
+     let delDir = await vehicleCategory.image.replace(`${req.protocol}://${req.get('host')}/`,"");
 
      await fs.unlink(delDir, function (err) {
          if (err) throw err;

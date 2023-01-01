@@ -80,8 +80,7 @@ exports.userVerificatiion = asyncHandler(async (req, res, next) =>{
         
     }
     const fileName = req.file.filename;
-    //const basePath = `${req.protocol}://${req.get('host')}/public/images/verification/`;
-    const basePath = `${req.protocol}://localhost:8000}/public/images/verification/`;
+    const basePath = `${req.protocol}://${req.get('host')}/public/images/verification/`;
    
    
     return  res.status(200).json({Success:true,Message:'image saved at path = '+basePath+fileName, responseCode :200});
@@ -230,7 +229,6 @@ exports.userJob = asyncHandler(async (req,res,next) => {
 exports.updateProfile = asyncHandler(async (req,res,next) => {
     const file = req.file; 
     var fileURL = null;
-    //const basePath = `${req.protocol}://${req.get('host')}/public/images/`;
     const basePath = `${req.protocol}://${req.get('host')}/public/images/`;
     if(typeof(file)!='undefined'){
         fileURL = `${basePath+'user-profile/'}${file.filename}`;
