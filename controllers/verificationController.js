@@ -44,7 +44,8 @@ exports.verifyUser = asyncHandler(async (req, res, next) => {
       if(!isfaceMatched){
          return res.status(400).json({Success:false,Message: 'Face Does not match with CNIC', responseCode :400});
       }
-      const basePath = `${req.protocol}://${req.get('host')}/public/images/verification/`;
+      //const basePath = `${req.protocol}://${req.get('host')}/public/images/verification/`;
+      const basePath = `${req.protocol}://localhost:8000/public/images/verification/`;
 
       let verification = new Verification({
          cnicFront      :     `${basePath+'cnicFront/'}${files.cnicFront[0].filename}`,
