@@ -6,20 +6,20 @@ const {sendNotification} = require('../helpers/notifications');
 
 var fs = require('fs');
 
-var deleteImages = (images,papers,insurance) => {
+var deleteImages = (images,papers,insurance, req) => {
     images?.map((path)=>{
         var directory = __dirname.replace("controllers", "");
-        path=path.replace("http://localhost:8000",directory);
+        path=path.replace(`${req.protocol}://${req.get('host')}`,directory);
         fs.unlinkSync(path);
     });
     papers?.map((path)=>{
         var directory = __dirname.replace("controllers", "");
-        path=path.replace("http://localhost:8000",directory);
+        path=path.replace(`${req.protocol}://${req.get('host')}`,directory);
         fs.unlinkSync(path);
     });
     insurance?.map((path)=>{
         var directory = __dirname.replace("controllers", "");
-        path=path.replace("http://localhost:8000",directory);
+        path=path.replace(`${req.protocol}://${req.get('host')}`,directory);
         fs.unlinkSync(path);
     });
 }
@@ -168,27 +168,27 @@ exports.addVehicle = asyncHandler(async (req,res) => {
     }
     else
     {
-        deleteImages(imagePaths,vehiclePapersImagePaths,vehicleInsuranceImagesPaths);
+        deleteImages(imagePaths,vehiclePapersImagePaths,vehicleInsuranceImagesPaths, req);
         return res.status(400).json({Success:false,Message:'vehicle images not provided, atleast 1 image is required', responseCode :400});
     }
     
     if(imagePaths.length<1){
-        deleteImages(imagePaths,vehiclePapersImagePaths,vehicleInsuranceImagesPaths);
+        deleteImages(imagePaths,vehiclePapersImagePaths,vehicleInsuranceImagesPaths, req);
         return res.status(400).json({Success:false,Message:'vehicle images not provided, atleast 1 image is required', responseCode :400});
     }
     if(vehiclePapersImagePaths.length<1){
-        deleteImages(imagePaths,vehiclePapersImagePaths,vehicleInsuranceImagesPaths);
+        deleteImages(imagePaths,vehiclePapersImagePaths,vehicleInsuranceImagesPaths, req);
         return res.status(400).json({Success:false,Message:'vehicle paper images not provided, atleast 1 vehicle paper image is required', responseCode :400});
     }
     if(vehicleInsuranceImagesPaths.length<1){
-        deleteImages(imagePaths,vehiclePapersImagePaths,vehicleInsuranceImagesPaths);
+        deleteImages(imagePaths,vehiclePapersImagePaths,vehicleInsuranceImagesPaths, req);
         return res.status(400).json({Success:false,Message:'vehicle insurance paper images not provided, atleast 1 vehicle insurance paper image is required', responseCode :400});
     }
 
      //handling validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        deleteImages(imagePaths,vehiclePapersImagePaths,vehicleInsuranceImagesPaths);
+        deleteImages(imagePaths,vehiclePapersImagePaths,vehicleInsuranceImagesPaths , req);
         return res.status(400).json({Success:false,Message: errors.array()[0].msg , responseCode :400});
     }
     var coordinatesArray = req.body.pickupLocation.map((item) => {
