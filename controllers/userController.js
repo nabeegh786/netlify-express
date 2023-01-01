@@ -133,18 +133,21 @@ exports.login = asyncHandler(async (req, res, next) => {
         return res.status(400).json({ Success: false, Message: errors.array()[0].msg , responseCode :400});
     }
 
-    user = await User.findOne({ $or: [{ email: req.body.username }, { username: req.body.username }] });
+    user = await (await User.findOne({ $or: [{ email: req.body.username }, { username: req.body.username }] })).populate("verificationID");
 
     if (!user) {
         return res.status(400).json({ Success: false, Message: 'Incorrect Credentials' , responseCode :400});
     }
     if (bcrypt.compareSync(req.body.password, user.passwordHash)) {
         let data = {
-            _id: user._id,
-            username: user.username,
-            email: user.email,
-            phone: user.phone,
-            isRenter: user.isRenter
+            _id              : user._id,
+            username         : user.username,
+            email            : user.email,
+            phone            : user.phone,
+            isRenter         : user.isRenter,
+            isVerified       : user.isVerified,
+            profilePicture   : user.profilePicture,
+            verification     : user.verificationID
         };
         var token = await jwt.sign({ user: data }, jwtsecret, {
 
