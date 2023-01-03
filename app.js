@@ -27,6 +27,7 @@ const vehiclesRoute = require('./routes/vehicles');
 const bookingsRoute = require('./routes/bookings');
 const reviews = require('./routes/reviews');
 const otp = require('./routes/otp');
+const payment = require('./routes/payment');
 
 
 //using Routes
@@ -35,13 +36,14 @@ app.use(`${api}/vehicles`,vehiclesRoute);
 app.use(`${api}/bookings`,bookingsRoute);
 app.use(`${api}/reviews`, reviews);
 app.use(`${api}/otp`, otp);
+app.use(`${api}/payments`, payment);
 
 
 
 
 //Database Connection
 mongoose.connect(process.env.CONNECTON_STRING,{
-    //must add in order to not get any error massages:
+    //must add in order to not get any error massages: mongoDB Password : Nodejs123
     useUnifiedTopology:true,
     useNewUrlParser: true,
     dbName :'eshop-databse',
@@ -54,11 +56,12 @@ mongoose.connect(process.env.CONNECTON_STRING,{
 })
 
 
+const port = process.env.PORT || 8000;
 
 //Server
-app.listen(8000, () => {
+app.listen(port, () => {
     console.log(api);
-    console.log('server is running on http://localhost:8000');
+    console.log(`server is running on http://localhost:${port}`);
 })
 
 

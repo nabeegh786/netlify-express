@@ -18,12 +18,13 @@ exports.verifyUser = asyncHandler(async (req, res, next) => {
    }
    var isfaceMatched = false;
    const formData = new FormData();
-   formData.append('files', files.image[0].path, files.image[0].originalname);
+   formData.append('file1', files.image[0].path, files.image[0].originalname);
+   formData.append('file2', files.cnicFront[0].path, files.cnicFront[0].originalname);
    let response;
 
    await axios.post('http://127.0.0.1:8000/uploadfile/', formData, {
          headers: {
-               'Content-Type': `multipart/form-data; boundary=${formData._boundary}`
+               'Content-Type': `multipart/form-data;`
          }
       }).then((responseFromServer2) => {
          console.log("first",responseFromServer2.data)
@@ -65,7 +66,7 @@ exports.verifyUser = asyncHandler(async (req, res, next) => {
 
       if(!verify) return res.status(500).json({ Success: false, Message: 'Something went wrong cannot verify account', responseCode :500 });
       
-      return res.status(400).json({Success:false,Message: 'your account has been successfully verified', responseCode :400});
+      return res.status(200).json({Success:false,Message: 'your account has been successfully verified', responseCode :200});
 
 
 });
@@ -81,9 +82,3 @@ exports.isVerified = asyncHandler(async (req, res, next) => {
    }
    return res.status(200).json({Success:true,Message: 'your account is verified', responseCode :200});
 });
-
-
-
-
-
-

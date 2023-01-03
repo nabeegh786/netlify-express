@@ -1,6 +1,7 @@
 const {User} = require('../models/User');
 const {VehicleCategory} = require('../models/VehicleCategory');
 const {Vehicle} = require('../models/Vehicle');
+const {Booking} = require('../models/Booking');
 const {check} = require('express-validator');
 const { buildCheckFunction } = require('express-validator');
 const { isValidObjectId } = require('mongoose');
@@ -220,9 +221,29 @@ const getNearByVehiclesValidation = [
 ]
 
 const addBookingValidation = [
-    check('rentee'  ,'rentee Id is not valid').isMongoId(),
+    check('cardNo').custom((value, {req, loc, path}) => {
+        if (value != '') {
+            var visaRegEx = /^(?:4[0-9]{12}(?:[0-9]{3})?)$/;
+            var mastercardRegEx = /^(?:5[1-5][0-9]{14})$/;
+            var amexpRegEx = /^(?:3[47][0-9]{13})$/;
+            var discovRegEx = /^(?:6(?:011|5[0-9][0-9])[0-9]{12})$/; 
+            if (!visaRegEx.test(value) && !mastercardRegEx.test(value) && !amexpRegEx.test(value) && !discovRegEx.test(value)) {
+                return Promise.reject('Invalid Card Number');
+            } 
+            return true;
+          } else {
+  
+             return Promise.reject('Card Number not provided');
+          }
+    }),
+    check('cvv' ).not().isEmpty().withMessage('cvv number not provided'),
+    check('cvv' ,'invalid CVV number').isLength({max:4}).isInt(),
+    check('cardHolderName' ).not().isEmpty().withMessage('cardHolderName not provided'),
+    check('expiry' ).not().isEmpty().withMessage('expiry not provided'),
     check('vehicle'  ,'vehicle Id is not valid').isMongoId(),
-//    check('selfDrive'  ,'selfDrive must be either true or false').isBoolean(),
+    //    check('selfDrive'  ,'selfDrive must be either true or false').isBoolean(),
+    check('startTime').not().isEmpty().withMessage('Booking Start Time not provided'),
+    check('endTime').not().isEmpty().withMessage('Booking End Time not provided'),
     check('startTime').custom((value, {req, loc, path}) => {
         value = new Date(req.body.startTime);
         timeNow = new Date();
@@ -265,16 +286,7 @@ const changePasswordValidation = [
     )
 ]
 
-const changePasswordValidationn = [
-    check('password','Password must be 6 or more characters long').isLength({ min: 6 }),
-    check('confirmPassword').custom((value, {req}) => {
-        if(value != req.body.password){
-            return Promise.reject("Password and its Confirmation didn't match");
-        }
-        return true;
-    }
-    )
-]
+
 
 const userProfileUpdateValidation = [
     check('username'         ,'username should be greater than 5 characters').isLength({min:5}),
@@ -305,6 +317,12 @@ const userProfileUpdateValidation = [
 
 ]
 
+const paymentValidation = [
+    
+   
+
+]
+
 
 module.exports = {
     userRegistrationValidation,
@@ -315,7 +333,8 @@ module.exports = {
     addBookingValidation,
     getBookingsValidation,
     changePasswordValidation,
-    userProfileUpdateValidation
+    userProfileUpdateValidation,
+    paymentValidation
 }
 
 

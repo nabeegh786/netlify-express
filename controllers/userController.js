@@ -1,5 +1,6 @@
 const asyncHandler = require('../middlewear/async');
 const { User } = require('../models/User');
+const {Wallet} = require('../models/Wallet');
 const { isValidObjectId } = require('mongoose');
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
@@ -35,14 +36,14 @@ exports.getUsers = asyncHandler(async (req, res, next) => {
 
         return res.status(200).json({Payload : user , responseCode :400});
     }
-    const users = await User.find()
-        .select('-passwordHash').populate('verificationID');
-
-    if (!users) {
+    //const users = await User.find()
+    //    .select('-passwordHash').populate('verificationID');
+    const count = res.advancedResults.count;
+    if (count < 1) {
         return res.status(404).json({ Success: false, Message: 'no user found', responseCode :404 });
     }
     
-    return res.status(200).json({ Success: true, Users: users , responseCode :200});
+    return res.status(200).json({ Success: true, Users: res.advancedResults , responseCode :200});
     
     
 });
@@ -114,6 +115,11 @@ exports.addUser = asyncHandler(async (req, res, next) => {
         phone: user.phone,
         isRenter: user.isRenter
     };
+    var userWallet = new Wallet({
+        user: user._id,
+        balance: 0
+    });
+    await userWallet.save();
     return res.status(200).json({ Success: true, Message: 'user added successfully', Payload: data, responseCode :200 });
 
 });
@@ -127,18 +133,21 @@ exports.login = asyncHandler(async (req, res, next) => {
         return res.status(400).json({ Success: false, Message: errors.array()[0].msg , responseCode :400});
     }
 
-    user = await User.findOne({ $or: [{ email: req.body.username }, { username: req.body.username }] });
+    user = await (await User.findOne({ $or: [{ email: req.body.username }, { username: req.body.username }] })).populate("verificationID");
 
     if (!user) {
         return res.status(400).json({ Success: false, Message: 'Incorrect Credentials' , responseCode :400});
     }
     if (bcrypt.compareSync(req.body.password, user.passwordHash)) {
         let data = {
-            _id: user._id,
-            username: user.username,
-            email: user.email,
-            phone: user.phone,
-            isRenter: user.isRenter
+            _id              : user._id,
+            username         : user.username,
+            email            : user.email,
+            phone            : user.phone,
+            isRenter         : user.isRenter,
+            isVerified       : user.isVerified,
+            profilePicture   : user.profilePicture,
+            verification     : user.verificationID
         };
         var token = await jwt.sign({ user: data }, jwtsecret, {
 

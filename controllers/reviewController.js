@@ -8,7 +8,10 @@ const {Vehicle} = require('../models/Vehicle');
 // @access    Public
 exports.getReviews = asyncHandler(async (req, res, next) => { 
   if (req.params.vehicleId) {
-    const reviews = await Review.find({ vehicle: req.params.vehicleId });
+    const reviews = await Review.find({ vehicle: req.params.vehicleId }).populate({
+      path: 'user',
+      select: 'username'
+    });
 
     return res.status(200).json({
       success : true,
@@ -25,9 +28,8 @@ exports.getReviews = asyncHandler(async (req, res, next) => {
 // @access    Public
 exports.getReview = asyncHandler(async (req, res, next) => {
   const review = await Review.findById(req.params.id).populate({
-    path: 'vehicle',
-    select: 'vehicleCategory description',
-    populate: 'vehicleCategory'
+    path: 'user',
+    select: 'username'
   });
 
   if (!review) {
