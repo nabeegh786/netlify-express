@@ -232,6 +232,7 @@ exports.updateProfile = asyncHandler(async (req,res,next) => {
     const basePath = `${req.protocol}://${req.get('host')}/public/images/`;
     if(typeof(file)!='undefined'){
         fileURL = `${basePath+'user-profile/'}${file.filename}`;
+        
     }
     
     const errors = validationResult(req);

@@ -123,7 +123,7 @@ router.route(`/`)
                                 return res.status(400).json({Success:false,Message:'more than 10 images for 1 field are not allowed for vehilces', responseCode : 400, errorCode : code});
                         }
                         // A Multer error occurred   when uploading
-                        return res.status(500).json({Success:false,Message:err.message, responseCode : 500});
+                        return res.status(500).json({Success:false,Message:'Wrong Format of Image', responseCode : 500});
                 } else if (err) {
                         // An unknown error occurred when uploading.
                         return res.status(400).json({Success:false,Message:err.message, responseCode : 400});      

@@ -127,7 +127,7 @@ const vehicleSchema = mongoose.Schema({
     },
     averageRating: {
         type: Number,
-        default: 0
+        default:0
         // min: [1, 'Rating must be at least 1'],
         // max: [5, 'Rating must can not be more than 10']
       },
