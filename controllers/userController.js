@@ -128,12 +128,13 @@ exports.addUser = asyncHandler(async (req, res, next) => {
 
 exports.login = asyncHandler(async (req, res, next) => {
 
+   
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json({ Success: false, Message: errors.array()[0].msg , responseCode :400});
     }
 
-    user = await (await User.findOne({ $or: [{ email: req.body.username }, { username: req.body.username }] })).populate("verificationID");
+    user = await User.findOne({ $or: [{ email: req.body.username }, { username: req.body.username }] }).populate("verificationID");
 
     if (!user) {
         return res.status(400).json({ Success: false, Message: 'Incorrect Credentials' , responseCode :400});
