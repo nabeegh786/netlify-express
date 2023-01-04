@@ -128,7 +128,6 @@ exports.addUser = asyncHandler(async (req, res, next) => {
 
 exports.login = asyncHandler(async (req, res, next) => {
 
-   
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json({ Success: false, Message: errors.array()[0].msg , responseCode :400});
