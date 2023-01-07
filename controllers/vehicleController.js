@@ -273,3 +273,48 @@ exports.approveOrRejectVehicle = asyncHandler(async (req,res) => {
         let  Message  = approve == '1' ? 'Approved' : 'Rejected';
         return res.status(200).json({Success:true,Message:`Vehicle ${Message} Successfully`, responseCode : 200});
 });
+
+
+
+
+
+exports.getMyVehicles = asyncHandler(async (req,res) => {
+    
+    var id = req.user.id;
+    var vehicles;
+    
+    
+    vehicles = await Vehicle.find({vehicleOwner : id}).populate('vehicleCategory');   
+    
+  
+        var pending     =    [];
+        var approved    =    [];
+        var rejected    =    [];
+       
+        vehicles.map((vehicle)=>{
+            if(vehicle.approvalStatus=='0') {
+                
+
+                pending.push(vehicle);
+            }
+            if(vehicle.approvalStatus=='2') {
+               
+                approved.push(vehicle);
+            }
+            if(vehicle.approvalStatus=='1') {
+               
+                rejected.push(vehicle);
+            }
+           
+        });
+
+
+        return res.status(200).json({Success:true,Message:'Showing your Vehicles',Payload:{pending : pending , approved: approved, rejected : rejected} , responseCode : 200});
+    
+    
+
+
+   
+   
+   
+});

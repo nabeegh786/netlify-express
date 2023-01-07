@@ -230,9 +230,11 @@ exports.updateProfile = asyncHandler(async (req,res,next) => {
     const file = req.file; 
     var fileURL = null;
     const basePath = `${req.protocol}://${req.get('host')}/public/images/`;
-    if(typeof(file)!='undefined'){
+    if(typeof(file)!='undefined' || file != null || file != ""){
         fileURL = `${basePath+'user-profile/'}${file.filename}`;
         
+    }else{
+        return res.status(400).json({ Success: false, Message:'profile picture not provided'  , responseCode :400});
     }
     
     const errors = validationResult(req);

@@ -21,7 +21,8 @@ const { getNearByVehicles,
         getVehicles, 
         getVehicleById, 
         addVehicle,
-        approveOrRejectVehicle } = require('../controllers/vehicleController');
+        approveOrRejectVehicle,
+        getMyVehicles } = require('../controllers/vehicleController');
 
 const advancedResults = require('../middlewear/advancedResults');
 
@@ -143,6 +144,12 @@ router.route(`/:id`)
 
 router.route(`/approveorrejectvehicle`)
         .post(protect,authorize('user', 'admin'),approveOrRejectVehicle);
+
+
+
+router.route(`/myvehicles/getmyvehicles`)
+        .get(protect,authorize('user'),getMyVehicles);
+
 
 
  module.exports = router;
