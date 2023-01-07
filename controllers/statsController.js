@@ -34,17 +34,18 @@ exports.getAppStatistics = asyncHandler(async (req, res, next) => {
 
 
       
-      return res.status(200).json({Success:true,stats : 
+      return res.status(200).json({Success:true,
+        stats : 
         {
-            totalusers              : totalusers,
-            verifiedUsers           : verifiedUsers,
-            newUsers                : newUsers,
-            totalApprovedVehicles   : totalVehicles,
-            newVehicles             : newVehicles,
-            noOfBookingsEachMonth   : refactorResponse(noOfBookingsEachMonth),
-            newBookings             : newBookings,
-            activeRentals           : activeRentals,
-            completedRentals        : completedRentals
+            totalusers              : totalusers       ? totalusers : 0,
+            verifiedUsers           : verifiedUsers    ? verifiedUsers : 0,
+            newUsers                : newUsers         ? newUsers : 0,
+            totalApprovedVehicles   : totalVehicles    ? totalVehicles : 0,
+            newVehicles             : newVehicles      ? newVehicles : 0,
+            newBookings             : newBookings      ? newBookings : 0,
+            activeRentals           : activeRentals    ? activeRentals : 0,
+            completedRentals        : completedRentals ? completedRentals : 0,
+            noOfBookingsEachMonth   : refactorResponse(noOfBookingsEachMonth)
 
          }, responseCode :200});
 
@@ -52,6 +53,7 @@ exports.getAppStatistics = asyncHandler(async (req, res, next) => {
 });
 
 const Months = {
+    
     '01' : 'January',
     '02' : 'Feburary',
     '03' : 'March',
