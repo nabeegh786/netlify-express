@@ -11,6 +11,7 @@ const asyncHandler = require('../middlewear/async');
 exports.getPayments = asyncHandler(async (req,res) => {
 
    let id = req.user._id;
+   console.log(id.toString());
    var walletBalance = await Wallet.findOne({user:id});
   // var payments = await Payment.find({ $and : {transactionId: { toUser : id} , completed : true}}).select('bookingId transactionId').populate({ path: 'transactionId', model: 'Transaction', select: 'amount transactionDate fromUser' }).populate('fromUser').select('username');
    var payments = await Payment.find({toUser : id , completed : true}).select('bookingId amount serviceCharges transactionDate').populate({ path: 'fromUser', model: 'User', select: 'username' });

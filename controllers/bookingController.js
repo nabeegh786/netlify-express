@@ -410,7 +410,7 @@ exports.endRental = asyncHandler(async (req,res) => {
         sendNotification('RentWheels Rental Completed',`Your Rental Has Been Completed by the Renter, Vehicle = ${vehicle.brand} ${vehicle.model} ${vehicle.year} Registration no = ${vehicle.registrationNumber}, Booking id = ${_booking._id} `, _booking.renter.firebaseToken );  
 
 
-        var wallet = await Wallet.findOne({user: id});
+        var wallet = await Wallet.findOne({user: _booking.renter._id});
         var payment = await Payment.findOne({bookingId: _booking._id});
        
         if(!payment){
@@ -418,7 +418,7 @@ exports.endRental = asyncHandler(async (req,res) => {
         }
         if(!wallet){
             var userWallet = new Wallet({
-                user: id,
+                user: _booking.renter._id,
                 balance: payment.amount
             });
 
@@ -427,7 +427,7 @@ exports.endRental = asyncHandler(async (req,res) => {
         }else{
         // update the wallet balance if already exist else insert
          Wallet.findOneAndUpdate(
-            { user:  id },
+            { user:  _booking.renter._id },
             { $set: { balance: wallet.balance +payment.amount} },
             { upsert: true, new: true },
             function(error) {
@@ -450,6 +450,8 @@ exports.endRental = asyncHandler(async (req,res) => {
                 if (error) return res.status(500).json({Success:false,Message : 'something went wrong', responseCode : 500});
 
             })
+
+
                 // if wallet balance updated successfully then send notification to Car owner
                 sendNotification('RentWheels Rental Completed',`Rental Completed Successfully, Total Rental Amount = ${payment.amount} rs has been transfered to your wallet, service charges = ${payment.serviceCharges} rs`, booking.renter.firebaseToken );
 
