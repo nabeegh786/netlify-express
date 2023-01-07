@@ -28,6 +28,7 @@ const bookingsRoute = require('./routes/bookings');
 const reviews = require('./routes/reviews');
 const otp = require('./routes/otp');
 const payment = require('./routes/payment');
+const stats = require('./routes/stats');
 
 
 //using Routes
@@ -37,6 +38,7 @@ app.use(`${api}/bookings`,bookingsRoute);
 app.use(`${api}/reviews`, reviews);
 app.use(`${api}/otp`, otp);
 app.use(`${api}/payments`, payment);
+app.use(`${api}/stats`, stats);
 
 
 

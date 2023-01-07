@@ -66,7 +66,7 @@ exports.verifyUser = asyncHandler(async (req, res, next) => {
 
       if(!verify) return res.status(500).json({ Success: false, Message: 'Something went wrong cannot verify account', responseCode :500 });
       
-      return res.status(200).json({Success:false,Message: 'your account has been successfully verified', responseCode :200});
+      return res.status(200).json({Success:true,Message: 'your account has been successfully verified', responseCode :200});
 
 
 });
