@@ -103,7 +103,7 @@ async function countCurrentWeekDocuments(Document) {
     ];
   
     const result = await Document.aggregate(pipeline);
-    return result[0].count;
+    return result.length > 0 ?  result[0].count : 0;
   }
   
   
