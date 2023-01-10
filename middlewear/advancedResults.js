@@ -48,7 +48,7 @@ const advancedResults = (model, populate) => async (req, res, next) => {
   if(typeof(reqQuery["excludeOwner"]) != "undefined"){
     reqQuery["vehicleOwner"] = { $ne : reqQuery["excludeOwner"]};
     reqQuery["approvalStatus"] = { $eq : '2' };
-    reqQuery["isBooked"] = {$eq : false};
+    //reqQuery["isBooked"] = {$eq : false};
   }
   //{$and: [ {_id : req.query.vehicle}, { startTime: { $gt: currentDate } } , { rentalStatus : { $ne : '2' } }]}
 
