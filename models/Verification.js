@@ -1,3 +1,4 @@
+const { string } = require('i/lib/util');
 const mongoose = require('mongoose');
 
 
@@ -24,6 +25,10 @@ const verificationSchema = mongoose.Schema({
     },
     image:{
         type:String,
+        required:true
+    },
+    cnicNo:{
+        type:string,
         required:true
     }
 
