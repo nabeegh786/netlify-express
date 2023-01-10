@@ -36,7 +36,7 @@ const advancedResults = (model, populate) => async (req, res, next) => {
       const latitude = Number(coordinates[0].trim());
       const longitude = Number(coordinates[1].trim());
       if(checkLatitude(latitude) && checkLongitude(longitude)){
-      reqQuery["pickupLocation"] =  {  $geoWithin:{ $centerSphere: [ [longitude,latitude], 4 / 6378.1 ] }}
+      reqQuery["pickupLocation"] =  {  $geoWithin:{ $centerSphere: [ [longitude,latitude], 5 / 6378.1 ] }}
       }else{
         delete reqQuery["pickupLocation"]
       }
@@ -72,6 +72,7 @@ const advancedResults = (model, populate) => async (req, res, next) => {
   //{registrationNumber:["BVAS-007","CVAS-007"]}
   //{registrationNumber:{$in:["BVAS-007","CVAS-007"]}}
   // Finding resource
+
 
 
   
@@ -192,3 +193,20 @@ const checkLongitude = (longitude) => {
   return isFinite(longitude) && Math.abs(longitude) <= 180;
 };
 module.exports = advancedResults;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

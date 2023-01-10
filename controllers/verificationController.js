@@ -16,34 +16,48 @@ exports.verifyUser = asyncHandler(async (req, res, next) => {
        var missingFields = await deleteImages(files,'verification');
        return res.status(400).json({Success:false,Message: missingFields+ 'not provided', responseCode :400});
    }
-   var isfaceMatched = false;
-   const formData = new FormData();
-   formData.append('file1', files.image[0].path, files.image[0].originalname);
-   formData.append('file2', files.cnicFront[0].path, files.cnicFront[0].originalname);
-   let response;
+   if( req.body.cnicNo == 'undefined' || req.body.cnicNo == null || req.body.cnicNo == ''){
+      var missingFields = await deleteImages(files,'verification');
+      return res.status(400).json({Success:false,Message: 'cninc number not provided', responseCode :400});
+   }
+   
+   // var isfaceMatched = false;
+   // const formData = new FormData();
+   // formData.append('file1', files.image[0].path, files.image[0].originalname);
+   // formData.append('file2', files.cnicFront[0].path, files.cnicFront[0].originalname);
+   // let response;
 
-   await axios.post('http://127.0.0.1:8000/uploadfile/', formData, {
-         headers: {
-               'Content-Type': `multipart/form-data;`
-         }
-      }).then((responseFromServer2) => {
-         console.log("first",responseFromServer2.data)
-         response = responseFromServer2.data
-         console.log("Sucess ->> ",response.Success);
-      }).catch((err) => {
-         console.log("Err ->>",err)
-      })
+   // await axios.post('http://127.0.0.1:8000/uploadfile/', formData, {
+   //       headers: {
+   //             'Content-Type': `multipart/form-data;`
+   //       }
+   //    }).then((responseFromServer2) => {
+   //       console.log("first",responseFromServer2.data)
+   //       response = responseFromServer2.data
+   //       console.log("Sucess ->> ",response.Success);
+   //    }).catch((err) => {
+   //       console.log("Err ->>",err)
+   //    })
       
-      if(typeof(response.Success)=='undefined'){
-         return res.status(500).json({Success:false,Message: 'Something Went Wrong Cannot Verify Account', responseCode :500});
-      }
-      if(response.Success == 'true' || response.Success == true){
-         isfaceMatched = true;
-      }
+   //    if(typeof(response)=='undefined')
+   //    {
+   //       return res.status(500).json({Success:false,Message: 'Cannot Verify Account, No response from Python verification server', responseCode :500});
+   //    }
 
-      if(!isfaceMatched){
-         return res.status(400).json({Success:false,Message: 'Face Does not match with CNIC', responseCode :400});
-      }
+   //    if(typeof(response.Success)=='undefined')
+   //    {
+   //       return res.status(500).json({Success:false,Message: 'Cannot Verify Account, No response from Python verification server', responseCode :500});
+   //    }
+
+   //    if(response.Success == 'true' || response.Success == true)
+   //    {
+   //       isfaceMatched = true;
+   //    }
+
+   //    if(!isfaceMatched)
+   //    {
+   //       return res.status(400).json({Success:false,Message: 'Face Does not match with CNIC', responseCode :400});
+   //    }
       const basePath = `${req.protocol}://${req.get('host')}/public/images/verification/`;
 
       let verification = new Verification({
@@ -53,6 +67,7 @@ exports.verifyUser = asyncHandler(async (req, res, next) => {
          licenseBack    :     `${basePath+'licenseBack/'}${files.licenseBack[0].filename}`,
          utilityBill    :     `${basePath+'utilityBill/'}${files.utilityBill[0].filename}`,
          image          :     `${basePath+'image/'}${files.image[0].filename}`,
+         cnicNo         :     req.body.cnicNo
      })
 
      verification = await verification.save();
@@ -66,7 +81,7 @@ exports.verifyUser = asyncHandler(async (req, res, next) => {
 
       if(!verify) return res.status(500).json({ Success: false, Message: 'Something went wrong cannot verify account', responseCode :500 });
       
-      return res.status(200).json({Success:true,Message: 'your account has been successfully verified', responseCode :200});
+      return res.status(200).json({Success:false,Message: 'your account has been successfully verified', responseCode :200});
 
 
 });

@@ -30,6 +30,9 @@ exports.addBooking = asyncHandler(async (req,res) => {
     let totalAmount = 0;
     let noOfDays = await days(startDatetime,enddDatetime);
     const vehicle = await Vehicle.findById(req.body.vehicle);
+    if(!vehicle){
+        return res.status(400).json({Success:false,Message: 'wrong vehicle id' , responseCode :400});
+    }
     totalAmount = vehicle.selfDriveDailyCharges * noOfDays;
     // if(selfDrive == 'true' || selfDrive == true)
     // {
@@ -303,21 +306,32 @@ exports.approveOrRejectBooking = asyncHandler(async (req,res) => {
 exports.startRental = asyncHandler(async (req,res) => {
     
     var id = req.user.id;
+    var cnicNo = req.body.cnicNo;
     var bookingID = req.body.bookingID;
     var startCode = req.body.startCode;
     if(bookingID == '' || bookingID == null || typeof(bookingID) == 'undefined' || !isValidObjectId(bookingID)){
         return res.status(400).json({ Success: false, Message: 'invalid booking ID', responseCode :400 });
     }
+    if(cnicNo =='' || cnicNo == null || typeof(cnicNo) == 'undefined'){
+        return res.status(400).json({ Success: false, Message: 'cnic not provided cannot start booking', responseCode :400 });
+    }
+
     if(id =='' || id == null || typeof(id) == 'undefined'){
         return res.status(400).json({ Success: false, Message: 'cannot start booking', responseCode :400 });
     }
+
     if(startCode =='' || startCode == null || typeof(startCode) == 'undefined'){
         return res.status(400).json({ Success: false, Message: 'please provide start code', responseCode :400 });
     }
 
     var booking = await Booking.findById(bookingID).populate({ path: 'renter rentee', model: 'User', select: '-passwordHash' }).populate('vehicle');  
     
-    
+    var renteeCNIC = await booking.rentee.populate("verificationID");
+   
+    if(renteeCNIC.verificationID.cnicNo != cnicNo){
+        return res.status(400).json({ Success: false, Message: 'wrong cnic No', responseCode :400 });
+    }
+
     if(!booking ){
         return res.status(400).json({ Success: false, Message: 'wrong booking id', responseCode :400 });
     }
