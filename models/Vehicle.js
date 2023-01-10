@@ -134,8 +134,8 @@ const vehicleSchema = mongoose.Schema({
 },
     {
         timestamps: true,
-        // toJSON: { virtuals: true },
-        // toObject: { virtuals: true }
+         toJSON: { virtuals: true },
+         toObject: { virtuals: true }
     }
 );
 
@@ -152,5 +152,30 @@ function arrayLimit(val) {
 //     this.formattedAddress = result.formattedAddress;
 //     next();
 //   });
+
+
+//  vehicleSchema.post('init',  function(vehicle) {
+//     //const result = await geocoder.reverse({ lat: this.pickupLocation.coordinates[1], lon: this.pickupLocation.coordinates[0] });
+//     let result =  vehicle.selfDriveDailyCharges;
+//     vehicle.set('selfDriveDailyCharges', result);
+   
+//   });
+
+
+
+vehicleSchema.virtual('formattedPrice').get( function () {
+    let p =  moneyFormat(this.selfDriveDailyCharges);
+    return p ;
+  });
+
+
+   function moneyFormat(price, sign = '') {
+    const pieces = parseFloat(price).toFixed(2).split('')
+    let ii = pieces.length - 3
+    while ((ii-=3) > 0) {
+      pieces.splice(ii, 0, ',')
+    }
+    return sign + pieces.join('')
+  }
 
 exports.Vehicle = mongoose.model('Vehicle', vehicleSchema);

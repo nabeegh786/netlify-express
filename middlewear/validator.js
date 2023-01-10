@@ -303,7 +303,7 @@ const userProfileUpdateValidation = [
         }),
     check('phone'            ,'invalid phone no').isMobilePhone(),
     check('phone'            ,'phone no should not exceed 11 digits').isLength({max:11}),
-    check('email'            ,'Please include a valid email').isEmail(),
+    check('email'            ,'Please include a valid email').isEmail().normalizeEmail({ gmail_remove_dots: true }),
     check('email').custom((value, {req, loc, path}) => {
         return User.findOne({
             email : req.body.email,
