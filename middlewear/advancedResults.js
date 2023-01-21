@@ -36,7 +36,7 @@ const advancedResults = (model, populate) => async (req, res, next) => {
       const latitude = Number(coordinates[0].trim());
       const longitude = Number(coordinates[1].trim());
       if(checkLatitude(latitude) && checkLongitude(longitude)){
-      reqQuery["pickupLocation"] =  {  $geoWithin:{ $centerSphere: [ [longitude,latitude], 5 / 6378.1 ] }}
+      reqQuery["pickupLocation"] =  {  $geoWithin:{ $centerSphere: [ [longitude,latitude], 2 / 6378.1 ] }}
       }else{
         delete reqQuery["pickupLocation"]
       }
