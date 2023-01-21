@@ -22,42 +22,42 @@ exports.verifyUser = asyncHandler(async (req, res, next) => {
    }
    
    var isfaceMatched = false;
-   const formData = new FormData();
-   formData.append('file1', files.image[0].path, files.image[0].originalname);
-   formData.append('file2', files.cnicFront[0].path, files.cnicFront[0].originalname);
-   let response;
+   // const formData = new FormData();
+   // formData.append('file1', files.image[0].path, files.image[0].originalname);
+   // formData.append('file2', files.cnicFront[0].path, files.cnicFront[0].originalname);
+   // let response;
 
-   await axios.post('http://127.0.0.1:8000/uploadfile/', formData, {
-         headers: {
-               'Content-Type': `multipart/form-data;`
-         }
-      }).then((responseFromServer2) => {
-         console.log("first",responseFromServer2.data)
-         response = responseFromServer2.data
-         console.log("Sucess ->> ",response.Success);
-      }).catch((err) => {
-         console.log("Err ->>",err)
-      })
+   // await axios.post('http://127.0.0.1:8000/uploadfile/', formData, {
+   //       headers: {
+   //             'Content-Type': `multipart/form-data;`
+   //       }
+   //    }).then((responseFromServer2) => {
+   //       console.log("first",responseFromServer2.data)
+   //       response = responseFromServer2.data
+   //       console.log("Sucess ->> ",response.Success);
+   //    }).catch((err) => {
+   //       console.log("Err ->>",err)
+   //    })
       
-      if(typeof(response)=='undefined')
-      {
-         return res.status(500).json({Success:false,Message: 'Cannot Verify Account, No response from Python verification server', responseCode :500});
-      }
+   //    if(typeof(response)=='undefined')
+   //    {
+   //       return res.status(500).json({Success:false,Message: 'Cannot Verify Account, No response from Python verification server', responseCode :500});
+   //    }
 
-      if(typeof(response.Success)=='undefined')
-      {
-         return res.status(500).json({Success:false,Message: 'Cannot Verify Account, No response from Python verification server', responseCode :500});
-      }
+   //    if(typeof(response.Success)=='undefined')
+   //    {
+   //       return res.status(500).json({Success:false,Message: 'Cannot Verify Account, No response from Python verification server', responseCode :500});
+   //    }
 
-      if(response.Success == 'true' || response.Success == true)
-      {
-         isfaceMatched = true;
-      }
+   //    if(response.Success == 'true' || response.Success == true)
+   //    {
+   //       isfaceMatched = true;
+   //    }
 
-      if(!isfaceMatched)
-      {
-         return res.status(400).json({Success:false,Message: 'Face Does not match with CNIC', responseCode :400});
-      }
+   //    if(!isfaceMatched)
+   //    {
+   //       return res.status(400).json({Success:false,Message: 'Face Does not match with CNIC', responseCode :400});
+   //    }
       const basePath = `${req.protocol}://${req.get('host')}/public/images/verification/`;
 
       let verification = new Verification({
