@@ -247,7 +247,7 @@ exports.approveOrRejectVehicle = asyncHandler(async (req,res) => {
     if(approve!='true' && approve!=true  && approve!='false' && approve!= false){
         return res.status(400).json({ Success: false, Message: 'approve or reject not provided', responseCode :400 });
     }
-     approve = req.body.approve == 'true' || req.body.approve ==  true ? '1' : '2';  
+     approve = req.body.approve == 'true' || req.body.approve ==  true ? '2' : '1';  
      
      if((reasonForRejection == '' || reasonForRejection == null || typeof(reasonForRejection) == 'undefined') && approve == '2'){
         return res.status(400).json({ Success: false, Message: 'Please provide the reason for rejection', responseCode :400 });
