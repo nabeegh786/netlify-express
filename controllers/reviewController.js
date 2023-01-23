@@ -48,6 +48,7 @@ exports.getReview = asyncHandler(async (req, res, next) => {
 exports.addReview = asyncHandler(async (req, res, next) => {
   req.body.vehicle = req.params.vehicleId;
   req.body.user = req.user.id;
+  console.log(req.body.rating);
 
   const vehicle = await Vehicle.findById(req.params.vehicleId);
 

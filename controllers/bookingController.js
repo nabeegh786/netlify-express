@@ -134,7 +134,7 @@ exports.getBookings = asyncHandler(async (req,res) => {
     if (req.query.vehicle) {
         if (!isValidObjectId(req.query.vehicle)) {
             return res.status(400).json({ Success: false, Message: 'invalid vehicle id', responseCode :400 });
-        }
+        };
        
         vehicle = await Vehicle.findOne({_id : req.query.vehicle}).populate('vehicleOwner vehicleCategory');           
         hasVehicle = true;
@@ -144,7 +144,7 @@ exports.getBookings = asyncHandler(async (req,res) => {
     var dates = [];
     res.advancedResults.data.map((booking) => {
         const start = new Date(booking.startTime), end = new Date(booking.endTime);
-        const range = moment.range(moment(start.setDate(start.getDate() + 1)), moment(end.setDate(end.getDate() + 1)));
+        const range = moment.range(moment(start.setDate(start.getDate())), moment(end.setDate(end.getDate())));
         Array.from(range.by('day')).map((date)=>{
             dates.push(date);
         });
@@ -282,10 +282,15 @@ exports.approveOrRejectBooking = asyncHandler(async (req,res) => {
                ,{new : true}
                );
            }
-        
-           if(!updatedBooking || !updatedVehicle){
+        if(approve == '2'){
+           if(!updatedBooking){
             success = false;
            }
+        }else if(approve == '1'){
+            if(!updatedBooking || !updatedVehicle){
+                success = false;
+            }
+        }
 
            let  Message  = approve == '1' ? 'Approved' : 'Rejected';
         if(success){
@@ -355,8 +360,8 @@ exports.startRental = asyncHandler(async (req,res) => {
         ).populate('rentee renter vehicle')
         .then((booking)=>{
           
-          sendNotification('RentWheels Rental Started',`Your Rental Has Been Started by the Car Owner, Vehicle = ${booking.vehicle.brand} ${booking.vehicle.model} ${booking.vehicle.year}, Registration no = ${booking.vehicle.registrationNumber}, Booking id = ${booking._id}  rental end time = ${Moment(booking.endTime).format('dd-MM-yyyy hh:mm a zzz')}`, booking.rentee.firebaseToken );
-          sendNotification('RentWheels Rental Started',`Your Rental Has Been Started, Vehicle = ${booking.vehicle.brand} ${booking.vehicle.model} ${booking.vehicle.year}, Registration no = ${booking.vehicle.registrationNumber}, Booking id = ${booking._id} rental end time = ${Moment(booking.endTime).format('dd-MM-yyyy hh:mm a zzz')}`, booking.renter.firebaseToken );  
+          sendNotification('RentWheels Rental Started',`Your Rental Has Been Started by the Car Owner, Vehicle = ${booking.vehicle.brand} ${booking.vehicle.model} ${booking.vehicle.year}, Registration no = ${booking.vehicle.registrationNumber}, Booking id = ${booking._id}  rental end time = ${Moment(booking.endTime).format('MMM Do YYYY h:mm:ss a')}`, booking.rentee.firebaseToken );
+          sendNotification('RentWheels Rental Started',`Your Rental Has Been Started, Vehicle = ${booking.vehicle.brand} ${booking.vehicle.model} ${booking.vehicle.year}, Registration no = ${booking.vehicle.registrationNumber}, Booking id = ${booking._id} rental end time = ${Moment(booking.endTime).format('MMM Do YYYY h:mm:ss a')}`, booking.renter.firebaseToken );  
           success = true;
           
         }).catch((error)=>{
