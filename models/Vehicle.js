@@ -19,8 +19,7 @@ const vehicleSchema = mongoose.Schema({
     },
     model:{
         type:String,
-        required:true,
-        unique:true
+        required:true
     },
     year:{
         type:String,
